@@ -19,6 +19,7 @@ afterEach(() => vi.restoreAllMocks());
 const json = (o: object) => JSON.stringify({ app: "treino", kind: "plano", schema: 1, ...o });
 const file = (t: string) => new File([t], "treinos.json", { type: "application/json" });
 async function open(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(await screen.findByRole("button", { name: "Ajustes" }));
   await user.click(await screen.findByRole("button", { name: "Importar treinos de um arquivo" }));
   await screen.findByRole("heading", { name: "Importar treinos" });
 }

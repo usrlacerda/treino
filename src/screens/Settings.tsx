@@ -13,9 +13,9 @@ const readLast = (): number | undefined => { try { const v = Number(localStorage
 const saveLast = (t: number) => { try { localStorage.setItem(KEY, String(t)); } catch { /* sem armazenamento */ } };
 
 
-interface Props { db: TreinoDB; onImported: (summary: string) => void }
+interface Props { db: TreinoDB; onImported: (summary: string) => void; onImportWorkouts: () => void }
 
-export function Settings({ db, onImported }: Props) {
+export function Settings({ db, onImported, onImportWorkouts }: Props) {
   const [msg, setMsg] = useState<{ ok: boolean; text: string }>();
   const [pending, setPending] = useState<Backup>();
   const [current, setCurrent] = useState<string>();
@@ -61,6 +61,11 @@ export function Settings({ db, onImported }: Props) {
   return (
     <main className="app">
       <BrandHeader title="Ajustes" />
+      <section className="exercise" aria-labelledby="tr-h">
+        <h2 id="tr-h">Treinos</h2>
+        <p className="muted">Adicione treinos de um arquivo, sem apagar os que você já tem.</p>
+        <button className="btn ghost wide" onClick={onImportWorkouts}><Icon name="download" size={20} />Importar treinos de um arquivo</button>
+      </section>
       <section className="exercise" aria-labelledby="bk-h">
         <h2 id="bk-h">Backup</h2>
         <p className="muted">Seus dados ficam só neste aparelho. Exporte um backup de vez em quando para não perder o histórico se limpar o navegador ou trocar de celular.</p>

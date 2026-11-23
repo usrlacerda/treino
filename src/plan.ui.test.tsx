@@ -61,7 +61,7 @@ describe("editar treino", () => {
     await openEditA(user);
     await user.click(screen.getByRole("button", { name: "Remover Agachamento no Smith" }));
     await user.click(screen.getByRole("button", { name: "Cancelar" }));
-    expect(await screen.findByText("Escolha o treino de hoje.")).toBeInTheDocument();
+    expect(await screen.findByText("Escolha o treino de hoje")).toBeInTheDocument();
     expect((await db.workouts.get("A"))!.items[0].exerciseId).toBe("abd-maquina");
   });
 

@@ -47,7 +47,7 @@ export function App({ db = defaultDb }: { db?: TreinoDB }) {
   }
   if (!ready) return <main className="app"><p className="muted">Carregando…</p></main>;
   if (importing) {
-    return <ImportWorkouts db={db} onClose={(msg) => { setNotice(msg); setDataVersion((n) => n + 1); setImporting(false); }} />;
+    return <ImportWorkouts db={db} onClose={(msg) => { setNotice(msg); setDataVersion((n) => n + 1); setImporting(false); if (msg) setTab("treinos"); }} />;
   }
   if (editing) {
     return <EditWorkout key={editing} db={db} workoutId={editing} onClose={(msg) => { setNotice(msg); setEditing(undefined); }} />;
@@ -68,10 +68,10 @@ export function App({ db = defaultDb }: { db?: TreinoDB }) {
   }
   return (
     <>
-      {tab === "treinos" && <Home key={dataVersion} db={db} notice={notice} onStart={(id, sid) => { setNotice(undefined); setResumeId(sid); setActive(id); }} onEdit={(id) => { setNotice(undefined); setEditing(id); }} onImport={() => { setNotice(undefined); setImporting(true); }} />}
+      {tab === "treinos" && <Home key={dataVersion} db={db} notice={notice} onStart={(id, sid) => { setNotice(undefined); setResumeId(sid); setActive(id); }} onEdit={(id) => { setNotice(undefined); setEditing(id); }} />}
       {tab === "biblioteca" && <Library key={dataVersion} db={db} />}
       {tab === "historico" && <History key={dataVersion} db={db} onGoTreinos={() => setTab("treinos")} />}
-      {tab === "ajustes" && <Settings db={db} onImported={(m) => { setDataVersion((n) => n + 1); setNotice(m); setTab("treinos"); }} />}
+      {tab === "ajustes" && <Settings db={db} onImportWorkouts={() => { setNotice(undefined); setImporting(true); }} onImported={(m) => { setDataVersion((n) => n + 1); setNotice(m); setTab("treinos"); }} />}
       <nav className="tabs" aria-label="Navegação">
         {TABS.map((t) => (
           <button key={t.id} aria-current={tab === t.id ? "page" : undefined} onClick={() => setTab(t.id)}>

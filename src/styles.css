@@ -256,3 +256,23 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 .bar-logo { margin-left: auto; display: flex; }
 .brandbar.compact { padding: 0 0 6px; gap: 8px; }
 .brandbar.compact .brand-name { font-size: 1.05rem; }
+
+/* Home: cartões de treino */
+.section-title { font-size: 1rem; font-weight: 600; margin: 4px 0 0; color: var(--muted); }
+.card-row { align-items: center; gap: 10px; }
+.card-row .card { padding: 16px 64px 16px 18px; gap: 6px; margin: 8px 0; }
+.card-head { display: flex; align-items: center; gap: 10px; }
+.card-head .badge.inline { margin-left: 0; background: var(--magenta); color: var(--on-magenta); }
+.card-meta { color: var(--muted); font-size: .9rem; }
+.card-preview { color: var(--text); font-size: .9rem; line-height: 1.35; opacity: .85; }
+.card-go { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-high); color: var(--accent); }
+.card.suggested { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); border-width: 2px; }
+.card.suggested .card-go { background: var(--accent); color: var(--on-accent); }
+.card-row .btn.edit { flex: none; width: 48px; min-width: 48px; padding: 0; }
+.card-row .btn.edit { background: var(--surface-high); color: var(--text); border-radius: 16px; height: 48px; }
+
+/* Home: editar dentro do cartão */
+.card-row { position: relative; display: block; }
+.card-row .card { padding: 16px 56px 16px 18px; }
+.card-row .btn.edit { position: absolute; top: 6px; right: 6px; width: 44px; min-width: 44px; height: 44px; min-height: 44px; border-radius: 50%; background: transparent; color: var(--muted); align-self: auto; }
+.card-row .btn.edit:hover, .card-row .btn.edit:focus-visible { color: var(--text); }

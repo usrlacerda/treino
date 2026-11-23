@@ -13,7 +13,7 @@ describe("ajustes finais", () => {
     render(<App db={new TreinoDB("m3-" + Math.random())} />);
     await user.click(await screen.findByRole("button", { name: "Histórico" }));
     await user.click(await screen.findByRole("button", { name: "Ir para Treinos" }));
-    expect(await screen.findByRole("button", { name: "Importar treinos de um arquivo" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /^Treino A/ })).toBeInTheDocument();
   });
   it("botão da série mantém o nome e alterna aria-pressed; timer mostra progresso", async () => {
     const user = userEvent.setup();
