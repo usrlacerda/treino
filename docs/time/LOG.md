@@ -84,3 +84,4 @@
 - Janela do exercício: imagem, texto e botões aparecem juntos (mostra "Carregando…" até o passo a passo chegar).
 - Bonecos da Biblioteca redesenhados: silhueta anatômica contínua, músculos com formato próprio (peito, deltoide, bíceps, abdômen em blocos, quadríceps/panturrilha, glúteos, costas, coração no cardio).
 - Bonecos agora usam o desenho anatômico de react-native-body-parts-anatomy (MIT; tools/build-body.mjs gera src/lib/bodyData.ts; créditos em THIRD_PARTY_NOTICES.md). Cardio acende o corpo todo.
+- Imagens dos exercícios refeitas: o catálogo original só tem 180 px; antes eu comprimia forte (q40/q55) e reduzia. Agora ampliadas com Lanczos + nitidez (animação 360 px q70 ≈ 97 MB; miniatura 300 px q80 ≈ 11 MB), baixadas só ao abrir o exercício. Índice (nomes) preservado.

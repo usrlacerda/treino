@@ -9,11 +9,13 @@ MUSCLE = {"abs":"abdomen","pectorals":"peito","biceps":"biceps","glutes":"gluteo
  "serratus anterior":"abdomen","cardiovascular system":"cardio"}
 data = json.load(open(f"{src}/data/exercises.json"))
 NAMES = json.load(open("tools/names-pt.json"))  # nomes em português (padrão de academia); o nome original em inglês vai junto para a busca
+from PIL import ImageFilter
+def ampliar(im, n): return im.convert("RGB").resize((n, n), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=1.6, percent=70, threshold=2))
 rows = []; total = 0
 for e in data:
     i = e["id"]; m = MUSCLE[e["target"]]
-    im = Image.open(f"{src}/{e['image']}").convert("RGB").resize((160, 160), Image.LANCZOS)
-    p = f"{out}/img/{i}.webp"; im.save(p, "WEBP", quality=55, method=6); total += os.path.getsize(p)
+    im = ampliar(Image.open(f"{src}/{e['image']}"), 300)  # o original tem só 180 px: amplia com Lanczos + nitidez, sem compressão forte
+    p = f"{out}/img/{i}.webp"; im.save(p, "WEBP", quality=80, method=6); total += os.path.getsize(p)
     rows.append([i, NAMES.get(i, e["name"]), m, e["equipment"], e["target"], e["name"]])
 import unicodedata
 # REGRA_PERNAS: agachamentos, leg press e afundos são de quadríceps (o dataset marca o alvo como glúteos)
