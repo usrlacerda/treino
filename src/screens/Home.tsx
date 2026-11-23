@@ -64,7 +64,7 @@ export function Home({ db, onStart, onEdit, onNew, notice }: Props) {
       })}
       <button className="btn ghost wide" onClick={onNew}><Icon name="add" size={20} />Novo treino</button>
       <footer className="credits muted">
-        CG - Corre Gordo · Imagens dos exercícios: © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a>
+        CG Fit · Imagens dos exercícios: © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a>
       </footer>
     </main>
   );

@@ -241,7 +241,7 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 .empty-icon { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--surface-high); color: var(--accent); }
 .empty-inline { margin: 24px 0; text-align: center; }
 
-/* ===== Identidade CG - Corre Gordo: roxo, magenta e laranja ===== */
+/* ===== Identidade CG Fit: roxo, magenta e laranja ===== */
 .brand { display: flex; align-items: center; gap: 12px; }
 .brand h1 { margin: 0; }
 .logo { flex: none; display: block; }

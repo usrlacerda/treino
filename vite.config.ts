@@ -14,9 +14,9 @@ export default defineConfig({
       registerType: "prompt",
       includeAssets: ["icon.svg", "apple-touch-icon.png", "favicon-32.png"],
       manifest: {
-        name: "CG - Corre Gordo",
-        short_name: "CG",
-        description: "CG - Corre Gordo: registro de treinos de musculação, funciona offline.",
+        name: "CG Fit",
+        short_name: "CG Fit",
+        description: "CG Fit: registro de treinos de musculação, funciona offline.",
         lang: "pt-BR",
         theme_color: "#14121a",
         background_color: "#ffffff",
