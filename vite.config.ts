@@ -31,7 +31,7 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,svg,png,webp}"],
         globIgnores: ["catalog/**"], // catálogo grande: baixa sob demanda e fica em cache para uso offline
         runtimeCaching: [
-          { urlPattern: ({ url }) => url.pathname.includes("/catalog/img/"), handler: "CacheFirst", options: { cacheName: "catalog-img", expiration: { maxEntries: 1500, maxAgeSeconds: 60 * 60 * 24 * 365 } } },
+          { urlPattern: ({ url }) => url.pathname.includes("/catalog/img/") || url.pathname.includes("/catalog/anim/"), handler: "CacheFirst", options: { cacheName: "catalog-img", expiration: { maxEntries: 3000, maxAgeSeconds: 60 * 60 * 24 * 365 } } },
           { urlPattern: ({ url }) => url.pathname.endsWith("/catalog/index.json"), handler: "StaleWhileRevalidate", options: { cacheName: "catalog-index" } },
         ],
       },

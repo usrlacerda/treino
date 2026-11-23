@@ -3,7 +3,7 @@ import { Icon } from "../components/Icon";
 import type { TreinoDB } from "../db/db";
 import type { Muscle } from "../db/types";
 import { catalogExerciseId, equipmentPt, loadCatalog, norm, targetPt, toExercise, type CatalogItem } from "../lib/catalog";
-import { mediaSrc } from "../lib/media";
+import { animSrc, mediaSrc } from "../lib/media";
 import { MUSCLE_LABEL, MUSCLES } from "../lib/muscles";
 
 const PAGE = 30;
@@ -17,6 +17,7 @@ export function Catalog({ db, onClose }: { db: TreinoDB; onClose: () => void }) 
   const [muscle, setMuscle] = useState<Muscle | "">("");
   const [limit, setLimit] = useState(PAGE);
   const [msg, setMsg] = useState<string>();
+  const [playing, setPlaying] = useState<string>();
 
   useEffect(() => {
     let alive = true;
@@ -61,7 +62,9 @@ export function Catalog({ db, onClose }: { db: TreinoDB; onClose: () => void }) 
           const id = catalogExerciseId(c.id), added = have.has(id);
           return (
             <li key={c.id} className="lib-item">
-              <img src={mediaSrc(id, 0)} alt="" width="56" height="56" loading="lazy" />
+              <button className="thumb" aria-label={playing === id ? `Parar animação de ${c.name}` : `Ver animação de ${c.name}`} aria-pressed={playing === id} onClick={() => setPlaying(playing === id ? undefined : id)}>
+                <img src={playing === id ? animSrc(id) : mediaSrc(id, 0)} alt="" width="56" height="56" loading="lazy" />
+              </button>
               <div className="lib-text">
                 <strong>{c.name}</strong>
                 <span className="muted">{MUSCLE_LABEL[c.muscle]} · {equipmentPt(c.equipment)} · {targetPt(c.target)}</span>

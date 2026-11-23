@@ -205,3 +205,7 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 .row-actions .btn.icon { flex: 0 0 auto; }
 .row-actions { justify-content: flex-start; }
 .row-actions .btn.icon.danger { margin-left: auto; }
+/* miniatura do catálogo vira botão que toca a animação */
+.thumb { padding: 0; border: 0; background: none; border-radius: 10px; flex: none; width: 56px; height: 56px; cursor: pointer; }
+.thumb img { display: block; border-radius: 10px; }
+.thumb:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }

@@ -6,7 +6,8 @@ import { TreinoDB, seedIfEmpty } from "./db/db";
 import { exportData, importBackup, parseBackup } from "./db/backup";
 import { deleteExercise } from "./db/plan";
 import { App } from "./App";
-import { mediaSrc } from "./lib/media";
+import { animSrc, mediaSrc } from "./lib/media";
+import { ExerciseMedia } from "./components/ExerciseMedia";
 import { resetCatalogCache, toExercise, toItem } from "./lib/catalog";
 
 vi.mock("./lib/alert", () => ({ notifyRestOver: vi.fn(), primeAudio: vi.fn() }));
@@ -75,5 +76,20 @@ describe("exercícios do catálogo no banco", () => {
     expect(await db2.exercises.get("ds-0002")).toBeTruthy();
     await deleteExercise(db2, "ds-0002");
     expect(await db2.exercises.get("ds-0002")).toBeUndefined();
+  });
+});
+
+describe("animação do exercício", () => {
+  it("mostra a demonstração animada de exercícios do catálogo", () => {
+    expect(animSrc("ds-0002")).toContain("catalog/anim/0002.webp");
+    render(<ExerciseMedia id="ds-0002" name="barbell bench press" />);
+    expect(screen.getByAltText("barbell bench press: demonstração do movimento")).toHaveAttribute("src", expect.stringContaining("anim/0002.webp"));
+  });
+  it("toca a animação ao tocar na miniatura do catálogo", async () => {
+    const user = userEvent.setup();
+    await openCatalog(user);
+    const btn = await screen.findByRole("button", { name: "Ver animação de dumbbell curl" });
+    await user.click(btn);
+    expect(screen.getByRole("button", { name: "Parar animação de dumbbell curl" })).toHaveAttribute("aria-pressed", "true");
   });
 });

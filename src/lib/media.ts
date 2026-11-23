@@ -8,6 +8,9 @@ export const MEDIA_FRAMES: Record<string, 1 | 2> = {
 /** Caminho relativo à base do app, para funcionar na raiz ou em subpasta (ex.: GitHub Pages). */
 /** Exercícios vindos do catálogo têm id "ds-<número>" e uma única miniatura em /public/catalog/img. */
 export const isCatalogId = (id: string) => id.startsWith("ds-");
+/** Animação (WebP) dos exercícios do catálogo. */
+export const animSrc = (id: string) => `${import.meta.env.BASE_URL}catalog/anim/${id.slice(3)}.webp`;
+export const prefersReducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 export const mediaFrames = (id: string): 0 | 1 | 2 => (isCatalogId(id) ? 1 : (MEDIA_FRAMES[id] ?? 0));
 export const mediaSrc = (id: string, frame: number) =>
   isCatalogId(id) ? `${import.meta.env.BASE_URL}catalog/img/${id.slice(3)}.webp` : `${import.meta.env.BASE_URL}exercises/${id}/${frame}.webp`;
