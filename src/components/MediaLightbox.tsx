@@ -24,7 +24,7 @@ export function MediaLightbox({ id, name, onClose, children }: { id: string; nam
         {!ready && <p className="lb-wait" role="status">Carregando…</p>}
         <h2 id="lb-t">{name}</h2>
         <div className="lightbox-img">
-          <img src={animated ? animSrc(id) : mediaSrc(id)} alt={animated ? `${name}: demonstração do movimento` : name} />
+          <img width={360} height={360} decoding="async" src={animated ? animSrc(id) : mediaSrc(id)} alt={animated ? `${name}: demonstração do movimento` : name} />
         </div>
         {info && info.p.length > 0 && (
           <section className="how" aria-labelledby="lb-how">

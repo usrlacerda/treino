@@ -393,3 +393,31 @@ button, input, select, textarea { font-family: inherit; }
 /* Treino ativo: descartar fica no fim da página (o Finalizar é fixo no rodapé); adicionar série */
 .btn.discard { display: flex; width: 100%; margin: 8px 0 0; background: transparent; color: var(--err, #ffb4ab); border: 1px solid var(--err, #ffb4ab); }
 .add-set { margin-top: 8px; }
+
+/* Recursos novos: meta da semana, recorde, anotação, anilhas, medidas */
+.goal { margin: 12px 0 4px; }
+.goal p { margin: 0 0 6px; }
+.bar-track { height: 10px; border-radius: 6px; background: var(--line, #3a3a44); overflow: hidden; }
+.bar-track span { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #4f148a, #d81b60, #ff6f00); }
+.notice.record { font-weight: 700; }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: .9rem; }
+.field input, .field select, .field textarea { font-size: 1rem; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--outline, #555); background: transparent; color: inherit; }
+.field.note { margin: 12px 0 4px; }
+.plate-out p { margin: 4px 0; }
+.measure-form { display: flex; flex-direction: column; gap: 10px; }
+.measure-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.measure-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.measure-list p { margin: 2px 0 0; }
+.m-item { margin-right: 10px; white-space: nowrap; }
+.session-note { margin: 4px 0 0; font-style: italic; }
+.session-row .btn.icon { flex: none; }
+
+/* Diretrizes de interface (Vercel): toque, janelas, números, títulos e textos longos */
+a, button, input, select, textarea, label, summary { touch-action: manipulation; }
+.overlay, .dialog { overscroll-behavior: contain; }
+h1, h2, h3, .hero-title { text-wrap: balance; }
+.stat strong, .record strong, .set input, .m-item, .goal strong, .rest-clock, .set-n { font-variant-numeric: tabular-nums; }
+.session-row > div, .measure-list li > div, .ex-title, .card-row > * { min-width: 0; }
+.session-row strong, .session-note, .ex-title h2, .m-item { overflow-wrap: anywhere; }
+.m-item { white-space: normal; display: inline-block; }
+@media (prefers-reduced-motion: reduce) { .tabs button .pill, .group-card::after { transition: none; } }

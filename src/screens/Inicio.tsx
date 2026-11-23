@@ -6,6 +6,7 @@ import { BrandHeader } from "../components/Logo";
 import { Icon } from "../components/Icon";
 import { TopBanners } from "../components/TopBanners";
 import { fmtNum, plural } from "../lib/format";
+import { getGoal } from "../lib/goal";
 import { greeting, relativeDay, summarizeWeek, volumeOf } from "../lib/week";
 
 const DAYS = [["S", "segunda"], ["T", "terça"], ["Q", "quarta"], ["Q", "quinta"], ["S", "sexta"], ["S", "sábado"], ["D", "domingo"]] as const;
@@ -32,6 +33,7 @@ export function Inicio({ db, notice, onStart, onGoTreinos }: Props) {
   const last = [...sessions].sort((a, b) => b.startedAt - a.startedAt)[0];
   const lastName = last && (workouts.find((w) => w.id === last.workoutId)?.name ?? "Treino");
   const list = today?.items.map((i) => names[i.exerciseId]).filter(Boolean) ?? [];
+  const goal = getGoal();
   const diff = week.prevVolume > 0 && week.count > 0 ? Math.round(((week.volume - week.prevVolume) / week.prevVolume) * 100) : undefined;
 
   return (
@@ -65,6 +67,10 @@ export function Inicio({ db, notice, onStart, onGoTreinos }: Props) {
             </li>
           ))}
         </ol>
+        <div className="goal" role="group" aria-label="Meta da semana">
+          <p><strong>{Math.min(week.count, goal)} de {goal}</strong> {goal === 1 ? "treino" : "treinos"} na meta da semana{week.count >= goal && <em className="up"> · meta batida!</em>}</p>
+          <div className="bar-track" role="progressbar" aria-valuemin={0} aria-valuemax={goal} aria-valuenow={Math.min(week.count, goal)} aria-label="Progresso da meta"><span style={{ width: `${Math.min(100, (week.count / goal) * 100)}%` }} /></div>
+        </div>
         <div className="stats">
           <div className="stat"><strong>{week.count}</strong><span>{week.count === 1 ? "treino" : "treinos"}</span></div>
           <div className="stat"><strong>{fmtNum(week.volume)}</strong><span>kg de volume{diff !== undefined && <em className={diff >= 0 ? "up" : "down"}> {diff >= 0 ? "+" : ""}{diff}% vs. semana passada</em>}</span></div>

@@ -71,7 +71,7 @@ export function EditWorkout({ db, workoutId, onClose, initialExercise }: Props) 
       <header className="bar">
         <h1>{workoutId === NEW_WORKOUT ? "Novo treino" : "Editar treino"}</h1>
       </header>
-      <label className="field">Nome do treino<input value={name} maxLength={40} onChange={(e) => { setName(e.target.value); setError(undefined); }} /></label>
+      <label className="field">Nome do treino<input autoComplete="off" name="nome-treino" value={name} maxLength={40} onChange={(e) => { setName(e.target.value); setError(undefined); }} /></label>
       {rows.map((r, i) => {
         const ex = byId[r.exerciseId];
         const nm = ex?.name ?? r.exerciseId;
@@ -79,13 +79,13 @@ export function EditWorkout({ db, workoutId, onClose, initialExercise }: Props) 
           <section key={r.exerciseId} className="exercise" aria-label={nm}>
             <h2>{i + 1}. {nm}</h2>
             {r.durationMin !== undefined ? (
-              <label className="field small">Duração (min)<input inputMode="numeric" aria-label={`Duração em minutos, ${nm}`} value={r.durationMin} onChange={(e) => patch(i, { durationMin: e.target.value })} /></label>
+              <label className="field small">Duração (min)<input autoComplete="off" spellCheck={false} inputMode="numeric" aria-label={`Duração em minutos, ${nm}`} value={r.durationMin} onChange={(e) => patch(i, { durationMin: e.target.value })} /></label>
             ) : (
               <div className="grid4">
-                <label className="field small">Séries<input inputMode="numeric" aria-label={`Séries, ${nm}`} value={r.sets} onChange={(e) => patch(i, { sets: e.target.value })} /></label>
-                <label className="field small">{ex?.timed ? "Mín. segundos" : "Mín. reps"}<input inputMode="numeric" aria-label={`${ex?.timed ? "Mínimo de segundos" : "Mínimo de repetições"}, ${nm}`} value={r.repMin} onChange={(e) => patch(i, { repMin: e.target.value })} /></label>
-                <label className="field small">{ex?.timed ? "Máx. segundos" : "Máx. reps"}<input inputMode="numeric" aria-label={`${ex?.timed ? "Máximo de segundos" : "Máximo de repetições"}, ${nm}`} value={r.repMax} onChange={(e) => patch(i, { repMax: e.target.value })} /></label>
-                <label className="field small">Descanso (s)<input inputMode="numeric" aria-label={`Descanso em segundos, ${nm}`} value={r.restSec} onChange={(e) => patch(i, { restSec: e.target.value })} /></label>
+                <label className="field small">Séries<input autoComplete="off" spellCheck={false} inputMode="numeric" aria-label={`Séries, ${nm}`} value={r.sets} onChange={(e) => patch(i, { sets: e.target.value })} /></label>
+                <label className="field small">{ex?.timed ? "Mín. segundos" : "Mín. reps"}<input autoComplete="off" spellCheck={false} inputMode="numeric" aria-label={`${ex?.timed ? "Mínimo de segundos" : "Mínimo de repetições"}, ${nm}`} value={r.repMin} onChange={(e) => patch(i, { repMin: e.target.value })} /></label>
+                <label className="field small">{ex?.timed ? "Máx. segundos" : "Máx. reps"}<input autoComplete="off" spellCheck={false} inputMode="numeric" aria-label={`${ex?.timed ? "Máximo de segundos" : "Máximo de repetições"}, ${nm}`} value={r.repMax} onChange={(e) => patch(i, { repMax: e.target.value })} /></label>
+                <label className="field small">Descanso (s)<input autoComplete="off" spellCheck={false} inputMode="numeric" aria-label={`Descanso em segundos, ${nm}`} value={r.restSec} onChange={(e) => patch(i, { restSec: e.target.value })} /></label>
               </div>
             )}
             <div className="row-actions">

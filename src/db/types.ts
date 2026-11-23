@@ -41,4 +41,16 @@ export interface Session {
   startedAt: number;
   finishedAt?: number;
   sets: LoggedSet[];
+  note?: string; // anotação do treino (ex.: "ombro incomodou")
+}
+
+/** Medidas corporais registradas pela pessoa; cada campo é opcional. */
+export interface Measure {
+  id?: number;
+  date: number;
+  weightKg?: number;
+  waistCm?: number;
+  chestCm?: number;
+  armCm?: number;
+  thighCm?: number;
 }

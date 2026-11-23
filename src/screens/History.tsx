@@ -3,6 +3,8 @@ import { Icon } from "../components/Icon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { discardSession, listFinishedSessions } from "../db/repo";
+import { Measures } from "../components/Measures";
+import { sessionText, shareText } from "../lib/share";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import type { Exercise, Session } from "../db/types";
 import { LoadChart } from "../components/LoadChart";
@@ -18,6 +20,7 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
   const [exId, setExId] = useState("");
 
   const [asking, setAsking] = useState<Session>();
+  const [shareMsg, setShareMsg] = useState<string>();
   const [removed, setRemoved] = useState<Session>(); // último treino excluído, ainda dá para desfazer
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -45,8 +48,13 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
     clearTimeout(timer.current);
     await load();
   }
+  async function share(s: Session) {
+    const r = await shareText(sessionText(s, names[s.workoutId] ?? "Treino", (id) => lib[id]?.name ?? id));
+    setShareMsg(r === "copied" ? "Resumo copiado. Cole onde quiser." : r === "failed" ? "Não conseguimos compartilhar agora. Tente de novo." : undefined);
+  }
   const extras = (
     <>
+      {shareMsg && <p className="notice" role="status">{shareMsg}</p>}
       {removed && (
         <div className="snackbar" role="status">
           <span>Treino excluído.</span>
@@ -77,6 +85,7 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
         <p className="muted">Conclua um treino para ver seu progresso aqui.</p>
         {onGoTreinos && <button className="btn" onClick={onGoTreinos}><Icon name="play" size={20} />Ir para Treinos</button>}
       </section>
+      <Measures db={db} />
       {extras}
     </main>
   );
@@ -107,10 +116,13 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
           <div>
             <strong>{names[s.workoutId] ?? s.workoutId}</strong> <span className="muted">· {formatDateFull(s.startedAt)}</span>
             <p className="muted">{plural(s.sets.length, "série", "séries")} · volume {fmt(sessionVolume(s))} kg</p>
+            {s.note && <p className="session-note">“{s.note}”</p>}
           </div>
+          <button className="btn icon" aria-label={`Compartilhar treino ${names[s.workoutId] ?? s.workoutId} de ${formatDateFull(s.startedAt)}`} title="Compartilhar" onClick={() => void share(s)}><Icon name="share" /></button>
           <button className="btn icon danger" aria-label={`Excluir treino ${names[s.workoutId] ?? s.workoutId} de ${formatDateFull(s.startedAt)}`} title="Excluir treino" onClick={() => setAsking(s)}><Icon name="delete" /></button>
         </div>
       ))}
+      <Measures db={db} />
       {extras}
     </main>
   );

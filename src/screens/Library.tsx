@@ -78,7 +78,7 @@ export function Library({ db, onPick, onClose, hide, onAdded, onCreateWorkout }:
           </>)
         : <BrandHeader title="Biblioteca" />}
       <label className="field">Buscar exercício
-        <input type="search" value={q} onChange={(e) => { setQ(e.target.value); setLimit(PAGE); }} />
+        <input type="search" autoComplete="off" spellCheck={false} name="busca" value={q} onChange={(e) => { setQ(e.target.value); setLimit(PAGE); }} />
       </label>
       {failed && !catalog && <p className="error block" role="alert">Não conseguimos carregar todos os exercícios. Conecte-se à internet para ver a biblioteca completa.</p>}
       {loading && <p className="muted" role="status">Carregando exercícios…</p>}

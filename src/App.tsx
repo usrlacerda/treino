@@ -100,7 +100,7 @@ export function App({ db = defaultDb, initialTab = "inicio" }: { db?: TreinoDB; 
   if (failed) {
     return (
       <main className="app" role="alert">
-        <h1>CG Fit</h1>
+        <h1 translate="no">CG Fit</h1>
         <p>Não conseguimos abrir seus dados neste navegador. Feche outras abas do Treino e tente de novo.</p>
         <button className="btn" onClick={() => setAttempt((n) => n + 1)}>Tentar de novo</button>
       </main>

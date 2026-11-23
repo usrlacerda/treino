@@ -10,6 +10,8 @@ import { notifyRestOver, primeAudio } from "../lib/alert";
 import { fmtNum, plural } from "../lib/format";
 import { progressionHint } from "../lib/progression";
 import { Icon } from "../components/Icon";
+import { PlateCalc } from "../components/PlateCalc";
+import { useWakeLock } from "../hooks/useWakeLock";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { RestTimer } from "../components/RestTimer";
 import { ExerciseMedia } from "../components/ExerciseMedia";
@@ -39,6 +41,11 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
   useBackClose(confirmExit, () => setConfirmExit(false));
   // Com séries marcadas, o voltar do aparelho pergunta antes de sair do treino.
   useBackClose(done.length > 0 && !confirmExit && !confirmDiscard, () => setConfirmExit(true));
+  const [prior, setPrior] = useState<Record<string, number>>({}); // maior carga já feita em cada exercício
+  const [record, setRecord] = useState<string>();
+  const [note, setNote] = useState("");
+  const [plates, setPlates] = useState(false);
+  useWakeLock(true);
   const [extra, setExtra] = useState<Record<string, number>>({});
   const [zoom, setZoom] = useState<{ id: string; name: string }>();
   const [leaveError, setLeaveError] = useState<string>();
@@ -50,11 +57,16 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
       if (!w || !alive) return;
       const ex = await db.exercises.bulkGet(w.items.map((i) => i.exerciseId));
       const prev: Record<string, LoggedSet[]> = await lastSetsForMany(db, w.items.map((i) => i.exerciseId));
+      const past = await db.sessions.filter((x) => x.finishedAt !== undefined).toArray();
+      const best: Record<string, number> = {};
+      for (const x of past) for (const y of x.sets) if (y.weightKg > (best[y.exerciseId] ?? 0)) best[y.exerciseId] = y.weightKg;
       const resumed = resumeSessionId !== undefined ? await db.sessions.get(resumeSessionId) : undefined;
       if (!alive) return;
+      setPrior(best);
       if (resumed && resumed.finishedAt === undefined && resumed.workoutId === workoutId) {
         sessionRef.current = Promise.resolve(resumed.id!);
         setDone(resumed.sets);
+        setNote(resumed.note ?? "");
         setInputs(Object.fromEntries(resumed.sets.map((s) => [`${s.exerciseId}:${s.setIndex}`, { w: fmtNum(s.weightKg), r: String(s.reps) }])));
       }
       setLib(Object.fromEntries(ex.filter((e): e is Exercise => !!e).map((e) => [e.id, e])));
@@ -122,6 +134,10 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
     setDone((d) => [...d.filter((x) => !(x.exerciseId === ex && x.setIndex === i)), set]);
     const item = workout!.items.find((it) => it.exerciseId === ex);
     primeAudio();
+    if (!cardio && weightKg > 0 && prior[ex] !== undefined && weightKg > prior[ex]) {
+      setRecord(`Novo recorde! ${lib[ex]?.name ?? "Exercício"}: ${fmtNum(weightKg)} kg (antes: ${fmtNum(prior[ex])} kg).`);
+    }
+    if (!cardio && weightKg > (prior[ex] ?? 0)) setPrior((p) => ({ ...p, [ex]: weightKg }));
     if (item && item.restSec > 0) { setAnnounce(""); rest.start(item.restSec, lib[ex]?.name ?? ""); }
   }
 
@@ -149,6 +165,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
       if (done.length === 0) await discardSession(db, id);
       else {
         await finishSession(db, id);
+        if (note.trim()) await db.sessions.update(id, { note: note.trim().slice(0, 500) });
         saved = { sets: done.length, volumeKg: done.reduce((v, x) => v + x.weightKg * x.reps, 0) };
       }
     }
@@ -163,6 +180,8 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
       </header>
       <p role="status" className="sr-only">{announce}</p>
       <p className="muted">Comece com 3 a 5 minutos de aquecimento leve.</p>
+      <button className="btn ghost small" onClick={() => setPlates(true)}><Icon name="scale" size={18} />Calculadora de anilhas</button>
+      {record && <p className="notice record" role="status">{record}</p>}
       {leaveError && <p className="error block" role="alert">{leaveError}</p>}
       {workout.items.map((item, n) => {
         const ex = lib[item.exerciseId];
@@ -207,9 +226,9 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
                   <span className="set-n">{cardio ? "Cardio" : `Série ${i + 1}`}</span>
                   {!noInputs && (
                     <>
-                      <input aria-label={`Carga em kg, série ${i + 1}, ${ex.name}`} inputMode="decimal" value={v.w} disabled={d}
+                      <input autoComplete="off" spellCheck={false} aria-label={`Carga em kg, série ${i + 1}, ${ex.name}`} inputMode="decimal" value={v.w} disabled={d}
                         aria-invalid={err ? true : undefined} onChange={(e) => setInput(item.exerciseId, i, { w: e.target.value })} placeholder={prev ? fmtNum(prev.weightKg) : "kg"} />
-                      <input aria-label={`Repetições (reps), série ${i + 1}, ${ex.name}`} inputMode="numeric" value={v.r} disabled={d}
+                      <input autoComplete="off" spellCheck={false} aria-label={`Repetições (reps), série ${i + 1}, ${ex.name}`} inputMode="numeric" value={v.r} disabled={d}
                         aria-invalid={err ? true : undefined} onChange={(e) => setInput(item.exerciseId, i, { r: e.target.value })} placeholder={prev ? String(prev.reps) : "reps"} />
                     </>
                   )}
@@ -231,10 +250,14 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
       {zoom && <MediaLightbox id={zoom.id} name={zoom.name} onClose={() => setZoom(undefined)} />}
       {done.length > 0 && (
         <>
+          <label className="field note">Anotação do treino (opcional)
+            <textarea autoComplete="off" rows={2} maxLength={500} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Ex.: ombro incomodou na terceira série…" />
+          </label>
           <button className="primary" onClick={() => void leave()}><Icon name="check" />Finalizar treino</button>
           <button className="btn discard" onClick={() => setConfirmDiscard(true)}><Icon name="delete" size={20} />Descartar treino</button>
         </>
       )}
+      {plates && <PlateCalc onClose={() => setPlates(false)} />}
       {confirmDiscard && (
         <ConfirmDialog title="Descartar este treino?" text={`As ${plural(done.length, "série", "séries")} deste treino não serão salvas. Não dá para desfazer.`}
           confirmLabel="Descartar treino" cancelLabel="Continuar treino" danger onConfirm={() => void discard()} onCancel={() => setConfirmDiscard(false)} />

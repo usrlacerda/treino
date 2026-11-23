@@ -7,6 +7,7 @@ import { formatDateFull } from "../lib/time";
 import { Icon } from "../components/Icon";
 import { plural } from "../lib/format";
 import { readText } from "../lib/download";
+import { getGoal, setGoal } from "../lib/goal";
 import pkg from "../../package.json";
 
 const KEY = "treino:lastBackup";
@@ -23,6 +24,7 @@ export function Settings({ db, onImported, onImportWorkouts }: Props) {
   useBackClose(!!pending, () => setPending(undefined));
   const [current, setCurrent] = useState<string>();
   const [last, setLast] = useState(readLast);
+  const [goal, setGoalState] = useState(getGoal);
   async function doExport() {
     try {
       const data = await exportData(db);
@@ -63,6 +65,15 @@ export function Settings({ db, onImported, onImportWorkouts }: Props) {
   return (
     <main className="app">
       <BrandHeader title="Ajustes" />
+      <section className="exercise" aria-labelledby="gl-h">
+        <h2 id="gl-h">Meta da semana</h2>
+        <p className="muted">Quantos treinos você quer fazer por semana. O progresso aparece no Início.</p>
+        <label className="field">Treinos por semana
+          <select aria-label="Meta de treinos por semana" value={goal} onChange={(e) => { const n = Number(e.target.value); setGoal(n); setGoalState(n); }}>
+            {[1, 2, 3, 4, 5, 6, 7].map((n) => <option key={n} value={n}>{n}</option>)}
+          </select>
+        </label>
+      </section>
       <section className="exercise" aria-labelledby="tr-h">
         <h2 id="tr-h">Treinos</h2>
         <p className="muted">Adicione treinos de um arquivo, sem apagar os que você já tem.</p>
