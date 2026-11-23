@@ -305,3 +305,30 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 .figure .hl:not(.on) { opacity: 0; }
 .group-card .figure { width: 84px; height: 134px; }
 button, input, select, textarea { font-family: inherit; }
+
+/* Tela do treino em andamento */
+.ex-card { padding: 14px 14px 10px; }
+.ex-card.all-done { border-color: var(--ok); }
+.ex-head { display: flex; align-items: flex-start; gap: 12px; }
+.ex-num { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-high); color: var(--text); font-weight: 700; font-size: .9rem; margin-top: 2px; }
+.all-done .ex-num { background: var(--ok); color: var(--on-ok); }
+.ex-title { flex: 1; min-width: 0; }
+.ex-title h2 { margin: 0 0 8px; font-size: 1.05rem; line-height: 1.25; }
+.ex-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-info { background: var(--surface-high); color: var(--muted); border-radius: 8px; padding: 3px 9px; font-size: .78rem; font-weight: 500; }
+.ex-thumb { flex: none; position: relative; width: 84px; height: 84px; padding: 0; border: 0; border-radius: 14px; overflow: hidden; background: #fff; cursor: zoom-in; }
+.ex-thumb .media { max-width: none; margin: 0; border-radius: 0; height: 100%; }
+.ex-card .cue { margin: 10px 0 6px; }
+.sets { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
+.sets .set { display: grid; grid-template-columns: 56px 1fr 1fr 56px; align-items: center; column-gap: 10px; row-gap: 2px; padding: 6px 0; }
+.sets .set + .set { border-top: 1px solid var(--line); }
+.sets .set-n { width: auto; color: var(--muted); font-weight: 600; font-size: .85rem; }
+.sets .set input { width: 100%; min-width: 0; min-height: 52px; font-size: 1.15rem; font-weight: 600; }
+.sets .set input::placeholder { color: var(--muted); opacity: .55; font-weight: 400; }
+.sets .set input:disabled { opacity: .7; }
+.sets .set .check { margin-left: 0; }
+.sets .set.done { background: color-mix(in srgb, var(--ok) 8%, transparent); border-radius: 12px; }
+.sets .set .prev { grid-column: 2 / -1; margin: 0; font-size: .75rem; }
+.sets .set .error { grid-column: 1 / -1; margin: 2px 0 0; }
+.sets .set:has(> .check:only-of-type):not(:has(input)) { grid-template-columns: 1fr 56px; }
+.sets .set.done .set-n { color: var(--text); }

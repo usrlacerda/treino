@@ -3,7 +3,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, vi } from "vitest";
 import { resetCatalogCache } from "./lib/catalog";
-import { TreinoDB } from "./db/db";
+import { TreinoDB, seedIfEmpty } from "./db/db";
 import { App } from "./App";
 
 vi.mock("./lib/alert", () => ({ notifyRestOver: vi.fn(), primeAudio: vi.fn() }));
@@ -52,8 +52,8 @@ describe("editar treino", () => {
     await user.click(await screen.findByText("Treino A"));
     expect(await screen.findByLabelText("Carga em kg, série 4, Agachamento no Smith")).toBeInTheDocument();
     const h2s = screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
-    expect(h2s[0]).toMatch(/1\. Puxada na polia com amplitude total/);
-    expect(h2s[1]).toMatch(/2\. Agachamento no Smith/);
+    expect(h2s[0]).toMatch(/Puxada na polia com amplitude total/);
+    expect(h2s[1]).toMatch(/Agachamento no Smith/);
   });
 
   it("mostra o erro e não salva quando o mínimo de repetições passa do máximo", async () => {
@@ -103,5 +103,19 @@ describe("escolher exercício ao editar o treino", () => {
     expect(await screen.findByText("Rosca martelo com halteres")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Cancelar" }));
     expect(await screen.findByRole("heading", { name: "Editar treino" })).toBeInTheDocument();
+  });
+});
+
+describe("novo treino", () => {
+  it("cria um treino do zero pelo botão Novo treino", async () => {
+    const db = new TreinoDB("nt-" + Math.random()); await seedIfEmpty(db);
+    const user = userEvent.setup();
+    render(<App db={db} />);
+    await user.click(await screen.findByRole("button", { name: "Novo treino" }));
+    expect(await screen.findByRole("heading", { name: "Novo treino" })).toBeInTheDocument();
+    await user.type(screen.getByLabelText("Nome do treino"), "Treino D");
+    await user.click(screen.getByRole("button", { name: "Salvar alterações" }));
+    expect(await screen.findByText("O treino precisa de pelo menos 1 exercício.")).toBeInTheDocument();
+    expect(await db.workouts.count()).toBe(3);
   });
 });

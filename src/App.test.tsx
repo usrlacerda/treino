@@ -80,8 +80,10 @@ describe("App", () => {
     const user = userEvent.setup();
     render(<App db={fresh()} />);
     await user.click(await screen.findByText("Treino A"));
-    const demo = await screen.findByAltText("Agachamento no Smith: demonstração do movimento");
-    expect(demo).toHaveAttribute("src", "/catalog/anim/0770.webp");
+    const thumb = await screen.findByRole("button", { name: "Ampliar demonstração de Agachamento no Smith" });
+    expect(thumb.querySelector("img")).toHaveAttribute("src", "/catalog/anim/0770.webp");
+    await user.click(thumb);
+    expect(await screen.findByAltText("Agachamento no Smith: demonstração do movimento")).toHaveAttribute("src", "/catalog/anim/0770.webp");
   });
 
   it("não registra série com repetições vazias", async () => {

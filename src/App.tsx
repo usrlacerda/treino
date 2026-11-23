@@ -4,7 +4,7 @@ import { closeStaleSessions } from "./db/repo";
 import { Home } from "./screens/Home";
 import { History } from "./screens/History";
 import { Library } from "./screens/Library";
-import { EditWorkout } from "./screens/EditWorkout";
+import { EditWorkout, NEW_WORKOUT } from "./screens/EditWorkout";
 import { Settings } from "./screens/Settings";
 import { ImportWorkouts } from "./screens/ImportWorkouts";
 import { ActiveWorkout } from "./screens/ActiveWorkout";
@@ -71,7 +71,7 @@ export function App({ db = defaultDb }: { db?: TreinoDB }) {
   }
   return (
     <>
-      {tab === "treinos" && <Home key={dataVersion} db={db} notice={notice} onStart={(id, sid) => { setNotice(undefined); setResumeId(sid); setActive(id); }} onEdit={(id) => { setNotice(undefined); setEditing(id); }} />}
+      {tab === "treinos" && <Home key={dataVersion} db={db} notice={notice} onStart={(id, sid) => { setNotice(undefined); setResumeId(sid); setActive(id); }} onEdit={(id) => { setNotice(undefined); setEditing(id); }} onNew={() => { setNotice(undefined); setEditing(NEW_WORKOUT); }} />}
       {tab === "biblioteca" && <Library key={dataVersion} db={db} />}
       {tab === "historico" && <History key={dataVersion} db={db} onGoTreinos={() => setTab("treinos")} />}
       {tab === "ajustes" && <Settings db={db} onImportWorkouts={() => { setNotice(undefined); setImporting(true); }} onImported={(m) => { setDataVersion((n) => n + 1); setNotice(m); setTab("treinos"); }} />}

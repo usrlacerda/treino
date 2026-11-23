@@ -9,9 +9,9 @@ import { nextWorkoutId } from "../db/repo";
 import type { Workout } from "../db/types";
 import { useUpdate } from "../lib/updater";
 
-interface Props { db: TreinoDB; onStart: (workoutId: string, resumeSessionId?: number) => void; onEdit: (workoutId: string) => void; notice?: string }
+interface Props { db: TreinoDB; onStart: (workoutId: string, resumeSessionId?: number) => void; onEdit: (workoutId: string) => void; onNew: () => void; notice?: string }
 
-export function Home({ db, onStart, onEdit, notice }: Props) {
+export function Home({ db, onStart, onEdit, onNew, notice }: Props) {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [names, setNames] = useState<Record<string, string>>({});
   const [next, setNext] = useState<string>();
@@ -62,6 +62,7 @@ export function Home({ db, onStart, onEdit, notice }: Props) {
           </div>
         );
       })}
+      <button className="btn ghost wide" onClick={onNew}><Icon name="add" size={20} />Novo treino</button>
       <footer className="credits muted">
         CG - Corre Gordo · Imagens dos exercícios: © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a>
       </footer>

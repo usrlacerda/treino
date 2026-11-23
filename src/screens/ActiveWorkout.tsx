@@ -10,6 +10,8 @@ import { progressionHint } from "../lib/progression";
 import { Icon } from "../components/Icon";
 import { RestTimer } from "../components/RestTimer";
 import { ExerciseMedia } from "../components/ExerciseMedia";
+import { MediaLightbox } from "../components/MediaLightbox";
+import { hasAnim } from "../lib/media";
 
 export interface SavedSummary { sets: number; volumeKg: number }
 interface Props { db: TreinoDB; workoutId: string; resumeSessionId?: number; onExit: (saved?: SavedSummary) => void }
@@ -30,6 +32,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
   const [inputs, setInputs] = useState<Record<string, { w: string; r: string }>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [confirmExit, setConfirmExit] = useState(false);
+  const [zoom, setZoom] = useState<{ id: string; name: string }>();
   const [leaveError, setLeaveError] = useState<string>();
 
   useEffect(() => {
@@ -148,11 +151,23 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
         const timed = !!ex.timed;
         const cardio = !!item.durationMin;
         const noInputs = cardio || timed;
+        const doneCount = Array.from({ length: item.sets }, (_, i) => isDone(item.exerciseId, i)).filter(Boolean).length;
         return (
-          <section key={n} className="exercise" aria-label={ex.name}>
-            <h2>{n + 1}. {ex.name}</h2>
-            <p className="muted">{cardio ? `${item.durationMin} min` : timed ? `${item.sets} séries · ${item.repMax} s · descanso ${item.restSec}s` : `${item.sets} séries · ${item.repMin === item.repMax ? item.repMin : `${item.repMin}-${item.repMax}`} reps · descanso ${item.restSec}s`}</p>
-            <ExerciseMedia id={ex.id} name={ex.name} />
+          <section key={n} className={"exercise ex-card" + (doneCount === item.sets ? " all-done" : "")} aria-label={ex.name}>
+            <div className="ex-head">
+              <span className="ex-num" aria-hidden="true">{doneCount === item.sets ? <Icon name="check" size={18} /> : n + 1}</span>
+              <div className="ex-title">
+                <h2>{ex.name}</h2>
+                <div className="ex-chips">
+                  {cardio ? <span className="chip-info">{item.durationMin} min</span> : <>
+                    <span className="chip-info">{item.sets} séries</span>
+                    <span className="chip-info">{timed ? `${item.repMax} s` : item.repMin === item.repMax ? `${item.repMin} reps` : `${item.repMin}-${item.repMax} reps`}</span>
+                    <span className="chip-info">descanso {item.restSec}s</span>
+                  </>}
+                </div>
+              </div>
+              {hasAnim(ex.id) && <button className="ex-thumb" aria-label={`Ampliar demonstração de ${ex.name}`} onClick={() => setZoom({ id: ex.id, name: ex.name })}><ExerciseMedia id={ex.id} name="" /></button>}
+            </div>
             <p className="cue">{ex.cue}</p>
             {(() => {
               const h = hintFor(item.exerciseId);
@@ -161,6 +176,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
                 ? <p className="hint up" role="note">Hora de subir a carga: {fmtNum(h.fromKg)} → {fmtNum(h.toKg)} kg. Na última vez você fez {plural(h.sets, "série", "séries")} de {h.reps} repetições com {fmtNum(h.fromKg)} kg.</p>
                 : <p className="hint" role="note">Na última vez alguma série ficou abaixo de {h.repMin} repetições com {fmtNum(h.weightKg)} kg. Mantenha ou reduza a carga hoje.</p>;
             })()}
+            <div className="sets">
             {Array.from({ length: item.sets }, (_, i) => {
               const v = valueOf(item.exerciseId, i);
               const prev = last[item.exerciseId]?.[i];
@@ -171,10 +187,10 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
                   <span className="set-n">{cardio ? "Cardio" : `Série ${i + 1}`}</span>
                   {!noInputs && (
                     <>
-                      <label>kg<input aria-label={`Carga em kg, série ${i + 1}, ${ex.name}`} inputMode="decimal" value={v.w} disabled={d}
-                        aria-invalid={err ? true : undefined} onChange={(e) => setInput(item.exerciseId, i, { w: e.target.value })} /></label>
-                      <label>reps<input aria-label={`Repetições (reps), série ${i + 1}, ${ex.name}`} inputMode="numeric" value={v.r} disabled={d}
-                        aria-invalid={err ? true : undefined} onChange={(e) => setInput(item.exerciseId, i, { r: e.target.value })} /></label>
+                      <input aria-label={`Carga em kg, série ${i + 1}, ${ex.name}`} inputMode="decimal" value={v.w} disabled={d}
+                        aria-invalid={err ? true : undefined} onChange={(e) => setInput(item.exerciseId, i, { w: e.target.value })} placeholder={prev ? fmtNum(prev.weightKg) : "kg"} />
+                      <input aria-label={`Repetições (reps), série ${i + 1}, ${ex.name}`} inputMode="numeric" value={v.r} disabled={d}
+                        aria-invalid={err ? true : undefined} onChange={(e) => setInput(item.exerciseId, i, { r: e.target.value })} placeholder={prev ? String(prev.reps) : "reps"} />
                     </>
                   )}
                   <button className="check" aria-pressed={d} aria-label={cardio ? "Cardio concluído" : `Série ${i + 1} concluída, ${ex.name}`}
@@ -186,10 +202,12 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
                 </div>
               );
             })}
+            </div>
           </section>
         );
       })}
       {rest.active && <RestTimer remaining={rest.remaining} total={rest.total} label={rest.label} onAdjust={rest.adjust} onSkip={rest.skip} />}
+      {zoom && <MediaLightbox id={zoom.id} name={zoom.name} onClose={() => setZoom(undefined)} />}
       <button className="primary" onClick={() => void leave()}><Icon name="check" />Finalizar treino</button>
       {confirmExit && (
         <div className="overlay">

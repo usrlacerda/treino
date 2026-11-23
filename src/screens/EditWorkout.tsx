@@ -7,6 +7,9 @@ import type { Exercise, Workout } from "../db/types";
 import { Library } from "./Library";
 
 interface Row { exerciseId: string; sets: string; repMin: string; repMax: string; restSec: string; durationMin?: string }
+/** id especial: abre o editor com um treino vazio, que só é gravado ao salvar. */
+export const NEW_WORKOUT = "novo";
+
 interface Props { db: TreinoDB; workoutId: string; onClose: (saved?: string) => void }
 
 const num = (s: string) => (s.trim() === "" ? NaN : Number(s));
@@ -21,7 +24,8 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
 
   useEffect(() => {
     (async () => {
-      const [w, ex] = await Promise.all([db.workouts.get(workoutId), db.exercises.toArray()]);
+      const [found, ex] = await Promise.all([workoutId === NEW_WORKOUT ? undefined : db.workouts.get(workoutId), db.exercises.toArray()]);
+      const w = found ?? (workoutId === NEW_WORKOUT ? { id: `w-${Date.now().toString(36)}`, name: "", order: ((await db.workouts.toArray()).reduce((m, x) => Math.max(m, x.order), 0)) + 1, items: [] } : undefined);
       if (!w) return;
       setBase(w); setName(w.name); setLib(ex.sort((a, b) => a.name.localeCompare(b.name, "pt-BR")));
       setRows(w.items.map((i) => ({ exerciseId: i.exerciseId, sets: String(i.sets), repMin: String(i.repMin), repMax: String(i.repMax), restSec: String(i.restSec), durationMin: i.durationMin !== undefined ? String(i.durationMin) : undefined })));
@@ -59,7 +63,7 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
       <BrandBar compact />
       <header className="bar">
         <button className="btn text back" onClick={() => onClose()}><Icon name="back" />Cancelar</button>
-        <h1>Editar treino</h1>
+        <h1>{workoutId === NEW_WORKOUT ? "Novo treino" : "Editar treino"}</h1>
       </header>
       <label className="field">Nome do treino<input value={name} maxLength={40} onChange={(e) => { setName(e.target.value); setError(undefined); }} /></label>
       {rows.map((r, i) => {

@@ -52,7 +52,8 @@ describe("treinos idênticos ao protocolo", () => {
     const user = userEvent.setup();
     render(<App db={db} />);
     await user.click(await screen.findByRole("button", { name: /^Treino B/ }));
-    expect(await screen.findByText("3 séries · 30 s · descanso 50s")).toBeInTheDocument();
+    expect(await screen.findByText("30 s")).toBeInTheDocument();
+    expect(screen.getAllByText("descanso 50s").length).toBeGreaterThan(0);
     expect(screen.queryByLabelText("Carga em kg, série 1, Prancha frontal")).toBeNull();
     await user.click(screen.getByRole("button", { name: "Série 1 concluída, Prancha frontal" }));
     expect(await screen.findByRole("timer")).toHaveTextContent("0:50");
