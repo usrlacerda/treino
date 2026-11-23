@@ -1,17 +1,16 @@
 import { useState } from "react";
-import { animSrc, isCatalogId, mediaFrames, mediaSrc, prefersReducedMotion } from "../lib/media";
+import { animSrc, hasAnim, mediaSrc, prefersReducedMotion } from "../lib/media";
 
-/** Ilustração com duas posições (início e fim do movimento) alternando em loop. Sem imagem: não mostra nada. */
+/** Demonstração animada do movimento (mesmo estilo para todos os exercícios). Com "reduzir movimento" ou se a animação falhar, mostra a imagem estática. */
 export function ExerciseMedia({ id, name }: { id: string; name: string }) {
+  const [animFailed, setAnimFailed] = useState(false);
   const [failed, setFailed] = useState(false);
-  const frames = mediaFrames(id) || undefined;
-  if (isCatalogId(id) && !failed && !prefersReducedMotion())
-    return <div className="media"><img src={animSrc(id)} alt={`${name}: demonstração do movimento`} loading="lazy" onError={() => setFailed(true)} /></div>;
-  if (!frames || (failed && !isCatalogId(id))) return null;
+  if (!hasAnim(id) || failed) return null;
+  const animated = !animFailed && !prefersReducedMotion();
   return (
     <div className="media">
-      <img src={mediaSrc(id, 0)} alt={frames === 2 ? `${name}: posição inicial` : name} loading="lazy" onError={() => setFailed(true)} />
-      {frames === 2 && <img src={mediaSrc(id, 1)} alt="" aria-hidden="true" loading="lazy" onError={() => setFailed(true)} />}
+      <img src={animated ? animSrc(id) : mediaSrc(id, 0)} alt={animated ? `${name}: demonstração do movimento` : name} loading="lazy"
+        onError={() => (animated ? setAnimFailed(true) : setFailed(true))} />
     </div>
   );
 }

@@ -5,9 +5,9 @@ import { exercises } from "../db/seed";
 describe("media", () => {
   it("todo exercício da biblioteca tem as ilustrações declaradas no disco", () => {
     for (const e of exercises) {
-      const n = MEDIA_FRAMES[e.id];
-      expect(n, e.id).toBeDefined();
-      for (let i = 0; i < n; i++) expect(existsSync(`public/exercises/${e.id}/${i}.webp`), `${e.id}/${i}`).toBe(true);
+      expect(MEDIA_FRAMES[e.id], e.id).toBeDefined();
+      expect(existsSync(`public/exercises/${e.id}/0.webp`), `${e.id}/0`).toBe(true);
+      expect(existsSync(`public/exercises/${e.id}/anim.webp`), `${e.id}/anim`).toBe(true);
     }
   });
 });

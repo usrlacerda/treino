@@ -105,7 +105,7 @@ describe("ajustes: backup", () => {
     render(<App db={fresh()} />);
     await openSettings(user);
     expect(screen.getByText(/consulte um profissional/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "RepDB" })).toHaveAttribute("href", "https://repdb.co");
+    expect(screen.getByRole("link", { name: "Gym visual" })).toHaveAttribute("href", "https://gymvisual.com/");
     expect(screen.getByText(/não envia seus dados para nenhum servidor/)).toBeInTheDocument();
   });
 });

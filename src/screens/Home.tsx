@@ -53,7 +53,7 @@ export function Home({ db, onStart, onEdit, onImport, notice }: Props) {
       ))}
       <button className="btn ghost wide" onClick={onImport}><Icon name="download" size={20} />Importar treinos de um arquivo</button>
       <footer className="credits muted">
-        Ilustrações: Exercise data by <a href="https://repdb.co" target="_blank" rel="noreferrer nofollow">RepDB</a> (repdb.co)
+        Demonstrações: dados hasaneyldrm/exercises-dataset, imagens © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a>
       </footer>
     </main>
   );

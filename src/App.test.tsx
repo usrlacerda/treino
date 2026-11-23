@@ -75,13 +75,12 @@ describe("App", () => {
     expect(screen.getByText(/1 série · volume 400 kg/)).toBeInTheDocument();
   });
 
-  it("mostra as duas ilustrações de execução do exercício", async () => {
+  it("mostra a demonstração animada do exercício", async () => {
     const user = userEvent.setup();
     render(<App db={fresh()} />);
     await user.click(await screen.findByText("Treino A"));
-    const inicial = await screen.findByAltText("Agachamento no Smith: posição inicial");
-    expect(inicial).toHaveAttribute("src", "/exercises/agach-smith/0.webp");
-    expect(document.querySelector('img[src="/exercises/agach-smith/1.webp"]')).not.toBeNull();
+    const demo = await screen.findByAltText("Agachamento no Smith: demonstração do movimento");
+    expect(demo).toHaveAttribute("src", "/exercises/agach-smith/anim.webp");
   });
 
   it("não registra série com repetições vazias", async () => {
