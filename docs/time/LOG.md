@@ -83,3 +83,4 @@
 - App renomeado para "CG Fit" (título, manifest, cabeçalho, ajustes). Ícone: monograma "CG" branco sobre degradê roxo → magenta → laranja (icon.svg, PNGs 32/180/192/512 e maskable com margem de segurança).
 - Janela do exercício: imagem, texto e botões aparecem juntos (mostra "Carregando…" até o passo a passo chegar).
 - Bonecos da Biblioteca redesenhados: silhueta anatômica contínua, músculos com formato próprio (peito, deltoide, bíceps, abdômen em blocos, quadríceps/panturrilha, glúteos, costas, coração no cardio).
+- Bonecos agora usam o desenho anatômico de react-native-body-parts-anatomy (MIT; tools/build-body.mjs gera src/lib/bodyData.ts; créditos em THIRD_PARTY_NOTICES.md). Cardio acende o corpo todo.
