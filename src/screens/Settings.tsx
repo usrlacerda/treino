@@ -65,7 +65,7 @@ export function Settings({ db, onImported }: Props) {
         <p className="muted">Seus treinos ficam só neste aparelho. Exporte um arquivo de tempos em tempos para não perder o histórico se limpar o navegador ou trocar de celular.</p>
         <p className="muted">{last ? `Último backup: ${formatDateFull(last)}.` : "Você ainda não fez backup."}</p>
         <button className="btn wide" onClick={() => void doExport()}><Icon name="upload" size={20} />Exportar backup</button>
-        <label className="field">Importar backup
+        <label className="btn ghost wide filebtn"><Icon name="download" size={20} />Importar backup
           <input type="file" accept="application/json,.json" onChange={(e) => void onFile(e)} />
         </label>
         {msg && <p className={msg.ok ? "notice" : "error block"} role={msg.ok ? "status" : "alert"}>{msg.text}</p>}
