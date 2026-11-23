@@ -1,3 +1,4 @@
+import { Icon } from "../components/Icon";
 import { useEffect, useMemo, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { listFinishedSessions } from "../db/repo";
@@ -31,7 +32,17 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
 
   const current = exId && withData.includes(exId) ? exId : withData[0] ?? "";
   if (!sessions) return <main className="app"><p className="muted">Carregando…</p></main>;
-  if (!sessions.length) return <main className="app"><h1>Histórico</h1><p className="muted">Nenhum treino finalizado ainda. Conclua um treino para ver seu progresso aqui.</p>{onGoTreinos && <button className="btn" onClick={onGoTreinos}>Ir para Treinos</button>}</main>;
+  if (!sessions.length) return (
+    <main className="app">
+      <h1>Histórico</h1>
+      <section className="empty" aria-label="Histórico vazio">
+        <span className="empty-icon" aria-hidden="true"><Icon name="history" size={40} /></span>
+        <h2>Nenhum treino finalizado</h2>
+        <p className="muted">Conclua um treino para ver seu progresso aqui.</p>
+        {onGoTreinos && <button className="btn" onClick={onGoTreinos}><Icon name="play" size={20} />Ir para Treinos</button>}
+      </section>
+    </main>
+  );
 
   const rec = current ? personalRecords(sessions, current) : null;
   return (

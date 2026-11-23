@@ -79,7 +79,7 @@ export function Library({ db }: { db: TreinoDB }) {
         </form>
       )}
       <p className="muted" aria-live="polite">{shown.length === 1 ? "1 exercício" : `${shown.length} exercícios`}</p>
-      {shown.length === 0 && <p className="muted">Nenhum exercício encontrado. Mude a busca, limpe o filtro ou crie um novo.</p>}
+      {shown.length === 0 && <p className="muted empty-inline">Nenhum exercício encontrado. Mude a busca, limpe o filtro ou crie um novo.</p>}
       <ul className="lib-list">
         {shown.map((e) => {
           const own = /^(custom|ds)-/.test(e.id);
