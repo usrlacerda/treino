@@ -1,3 +1,4 @@
+import { Icon } from "../components/Icon";
 import { useEffect, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { saveWorkout } from "../db/plan";
@@ -52,7 +53,7 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
   return (
     <main className="app">
       <header className="bar">
-        <button className="link" onClick={() => onClose()}>‹ Cancelar</button>
+        <button className="btn text back" onClick={() => onClose()}><Icon name="back" />Cancelar</button>
         <h1>Editar treino</h1>
       </header>
       <label className="field">Nome do treino<input value={name} maxLength={40} onChange={(e) => { setName(e.target.value); setError(undefined); }} /></label>
@@ -73,9 +74,9 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
               </div>
             )}
             <div className="row-actions">
-              <button className="btn ghost small" disabled={i === 0} aria-label={`Subir ${nm}`} onClick={() => move(i, -1)}>Subir</button>
-              <button className="btn ghost small" disabled={i === rows.length - 1} aria-label={`Descer ${nm}`} onClick={() => move(i, 1)}>Descer</button>
-              <button className="btn ghost small" aria-label={`Remover ${nm}`} onClick={() => remove(i)}>Remover</button>
+              <button className="btn icon" disabled={i === 0} aria-label={`Subir ${nm}`} title="Subir" onClick={() => move(i, -1)}><Icon name="up" /></button>
+              <button className="btn icon" disabled={i === rows.length - 1} aria-label={`Descer ${nm}`} title="Descer" onClick={() => move(i, 1)}><Icon name="down" /></button>
+              <button className="btn icon danger" aria-label={`Remover ${nm}`} title="Remover" onClick={() => remove(i)}><Icon name="delete" /></button>
             </div>
           </section>
         );
@@ -87,10 +88,10 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
             {available.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
           </select>
         </label>
-        <button className="btn ghost" disabled={!pick} onClick={add}>Adicionar ao treino</button>
+        <button className="btn tonal" disabled={!pick} onClick={add}><Icon name="add" size={20} />Adicionar ao treino</button>
       </div>
       {error && <p className="error block" role="alert">{error}</p>}
-      <button className="primary" onClick={() => void save()}>Salvar alterações</button>
+      <button className="primary" onClick={() => void save()}><Icon name="save" />Salvar alterações</button>
     </main>
   );
 }

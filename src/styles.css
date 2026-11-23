@@ -1,11 +1,11 @@
 :root { color-scheme: dark light;
   --bg:#14121a; --surface:#1d1b24; --surface-high:#2a2733; --line:#38353f; --outline:#948f9f; --text:#e8e3ee; --muted:#b4afbf;
   --accent:#a78bfa; --on-accent:#17102b; --ok:#4ade80; --on-ok:#06210f; --err:#fca5a5; --err-line:#f87171;
-  --notice-bg:#16301f; --notice-line:#1f5a34; --notice-text:#bbf7d0; --banner-bg:#2a2540; --ok-text:#bbf7d0; --rail:96px; }
+  --notice-bg:#16301f; --notice-line:#1f5a34; --notice-text:#bbf7d0; --banner-bg:#2a2540; --ok-text:#bbf7d0; --rail:96px; --err-fill:#f2b8b5; --on-err-fill:#410e0b; }
 @media (prefers-color-scheme: light) { :root {
   --bg:#fdf8ff; --surface:#f3eef8; --surface-high:#e9e2f1; --line:#d4cddc; --outline:#7a7585; --text:#1c1b20; --muted:#5b5766;
   --accent:#6a43c8; --on-accent:#ffffff; --ok:#1e7a3c; --on-ok:#ffffff; --err:#a3201d; --err-line:#b3261e;
-  --notice-bg:#e3f5e8; --notice-line:#9bd1ab; --notice-text:#12391f; --banner-bg:#e9e0fb; --ok-text:#12391f; } }
+  --notice-bg:#e3f5e8; --notice-line:#9bd1ab; --notice-text:#12391f; --banner-bg:#e9e0fb; --ok-text:#12391f; --err-fill:#b3261e; --on-err-fill:#ffffff; } }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
 .app { padding: 16px 16px 96px; max-width: 640px; margin: 0 auto; }
@@ -125,3 +125,65 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 }
 .banner.resume { flex-direction: column; align-items: stretch; }
 .banner.resume .row-actions { margin-top: 0; }
+
+/* ===== Botões e ícones (Material 3) ===== */
+.icon { flex: none; display: block; }
+.btn, .primary, .check, .chip, .tabs button, .rest-actions button, .card {
+  position: relative; overflow: hidden; -webkit-tap-highlight-color: transparent; cursor: pointer;
+}
+/* camada de estado: passar o mouse, foco e toque escurecem/clareiam com a própria cor do texto */
+.btn::after, .primary::after, .check::after, .chip::after, .tabs button::after, .rest-actions button::after, .card::after {
+  content: ""; position: absolute; inset: 0; background: currentColor; opacity: 0; pointer-events: none; border-radius: inherit; transition: opacity .15s;
+}
+@media (hover: hover) { .btn:hover::after, .primary:hover::after, .check:hover::after, .chip:hover::after, .rest-actions button:hover::after, .card:hover::after { opacity: .08; } }
+.btn:focus-visible::after, .primary:focus-visible::after, .check:focus-visible::after, .chip:focus-visible::after, .rest-actions button:focus-visible::after, .card:focus-visible::after { opacity: .12; }
+.btn:active::after, .primary:active::after, .check:active::after, .chip:active::after, .tabs button:active::after, .rest-actions button:active::after, .card:active::after { opacity: .16; }
+.btn:disabled, .btn[disabled] { opacity: 1; background: color-mix(in srgb, var(--text) 12%, transparent); color: color-mix(in srgb, var(--text) 38%, transparent); border-color: transparent; cursor: default; }
+.btn:disabled::after { display: none; }
+
+/* preenchido (ação principal) */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 24px; border-radius: 999px; border: 0; background: var(--accent); color: var(--on-accent); font: inherit; font-weight: 600; letter-spacing: .01em; }
+.btn.small { min-height: 40px; padding: 0 16px; }
+.btn.wide { display: flex; width: 100%; }
+/* tonal (apoio) */
+.btn.tonal { background: var(--surface-high); color: var(--text); }
+/* contornado */
+.btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--outline); }
+/* texto */
+.btn.text { background: transparent; color: var(--accent); padding: 0 12px; }
+.btn.back { padding-left: 8px; margin-left: -8px; }
+/* botão de ícone */
+.btn.icon { width: 48px; min-width: 48px; padding: 0; background: transparent; color: var(--text); }
+.btn.icon:disabled { background: transparent; }
+/* ação destrutiva */
+.btn.danger { background: var(--err-fill); color: var(--on-err-fill); }
+.btn.text.danger, .btn.icon.danger { background: transparent; color: var(--err); }
+.card-row .btn.edit { min-height: 48px; align-self: center; }
+
+/* extensão do FAB (ação principal da tela) */
+.primary { display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 28px; min-height: 56px; box-shadow: 0 3px 8px #0006, 0 1px 3px #0004; }
+
+/* marcar série: botão de alternância circular */
+.check { display: flex; align-items: center; justify-content: center; border-radius: 50%; width: 52px; height: 52px; padding: 0; border: 2px solid var(--outline); background: transparent; color: var(--text); }
+.check[aria-pressed="true"] { background: var(--ok); color: var(--on-ok); border-color: var(--ok); }
+
+/* chips de filtro */
+.chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; border-color: var(--outline); color: var(--text); padding: 0 12px; }
+.chip[aria-pressed="true"] { background: var(--surface-high); color: var(--text); border-color: transparent; font-weight: 600; }
+
+/* barra de navegação: indicador em pílula com camada de estado */
+.tabs button .pill { transition: background-color .2s; }
+.tabs button:active .pill { background: color-mix(in srgb, var(--text) 16%, transparent); }
+.tabs button[aria-current="page"] .pill { background: var(--accent); color: var(--on-accent); }
+.tabs button::after { display: none; }
+
+/* timer */
+.rest-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 4px; border-radius: 999px; min-width: 48px; min-height: 48px; padding: 0 14px; background: var(--surface-high); border: 1px solid var(--outline); color: var(--text); font-weight: 600; }
+.rest-actions button:last-child { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+.row-actions .btn { flex: 1 1 auto; }
+@media (prefers-reduced-motion: reduce) { .btn::after, .primary::after, .check::after, .chip::after { transition: none; } }
+/* timer: o rótulo tem prioridade sobre o espaçamento dos botões */
+.rest-main { flex: 1 1 auto; min-width: 84px; }
+.rest-actions { gap: 6px; flex: none; }
+.rest-actions button { padding: 0 10px; min-width: 44px; }
+@media (max-width: 400px) { .rest-actions button:not(:last-child) { padding: 0 8px; } .rest { gap: 8px; padding: 12px; } }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { backupFileName, exportData, importBackup, isBackupError, MAX_BACKUP_BYTES, parseBackupText, type Backup } from "../db/backup";
 import { formatDateFull } from "../lib/time";
+import { Icon } from "../components/Icon";
 import { plural } from "../lib/format";
 import { readText } from "../lib/download";
 import pkg from "../../package.json";
@@ -63,7 +64,7 @@ export function Settings({ db, onImported }: Props) {
         <h2 id="bk-h">Backup</h2>
         <p className="muted">Seus treinos ficam só neste aparelho. Exporte um arquivo de tempos em tempos para não perder o histórico se limpar o navegador ou trocar de celular.</p>
         <p className="muted">{last ? `Último backup: ${formatDateFull(last)}.` : "Você ainda não fez backup."}</p>
-        <button className="btn wide" onClick={() => void doExport()}>Exportar backup</button>
+        <button className="btn wide" onClick={() => void doExport()}><Icon name="upload" size={20} />Exportar backup</button>
         <label className="field">Importar backup
           <input type="file" accept="application/json,.json" onChange={(e) => void onFile(e)} />
         </label>

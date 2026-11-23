@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { applyImport, buildPreview, exportPlan, parsePlanText, planTemplate, PlanImportError, suggestName, type ImportPreview } from "../db/planImport";
+import { Icon } from "../components/Icon";
 import { downloadJson, readText } from "../lib/download";
 import { plural } from "../lib/format";
 import { MUSCLE_LABEL } from "../lib/muscles";
@@ -86,7 +87,7 @@ export function ImportWorkouts({ db, onClose }: Props) {
   return (
     <main className="app">
       <header className="bar">
-        <button className="link" onClick={() => onClose()}><span aria-hidden="true">‹ </span>Voltar</button>
+        <button className="btn text back" onClick={() => onClose()}><Icon name="back" />Voltar</button>
         <h1>Importar treinos</h1>
       </header>
 
@@ -106,8 +107,8 @@ export function ImportWorkouts({ db, onClose }: Props) {
             <h2 id="imp2"><span className="step">2</span> Ainda não tem o arquivo?</h2>
             <p className="muted">Baixe o modelo, edite os treinos e importe de volta. Você também pode exportar os seus treinos para passar a outra pessoa.</p>
             <div className="row-actions">
-              <button className="btn ghost" onClick={() => downloadJson("treino-modelo.json", planTemplate())}>Baixar modelo</button>
-              <button className="btn ghost" onClick={() => void exportPlan(db).then((p) => downloadJson("treino-meus-treinos.json", p))}>Exportar meus treinos</button>
+              <button className="btn ghost" onClick={() => downloadJson("treino-modelo.json", planTemplate())}><Icon name="download" size={20} />Baixar modelo</button>
+              <button className="btn ghost" onClick={() => void exportPlan(db).then((p) => downloadJson("treino-meus-treinos.json", p))}><Icon name="upload" size={20} />Exportar meus treinos</button>
             </div>
             <details className="how">
               <summary>Como montar o arquivo</summary>
@@ -165,8 +166,9 @@ export function ImportWorkouts({ db, onClose }: Props) {
           )}
           {error && <p className="error block" role="alert">{error}</p>}
           <div className="sticky-actions">
-            <button className="btn ghost" onClick={() => { setPreview(undefined); setRows([]); setError(undefined); }}>Escolher outro arquivo</button>
+            <button className="btn ghost" onClick={() => { setPreview(undefined); setRows([]); setError(undefined); }}><Icon name="refresh" size={20} />Escolher outro arquivo</button>
             <button className="btn" disabled={blocked || busy} onClick={() => void confirm()}>
+              <Icon name="add" size={20} />
               {chosen === 0 ? "Escolha um treino" : `Adicionar ${plural(chosen, "treino", "treinos")}`}
             </button>
           </div>

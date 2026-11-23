@@ -6,6 +6,7 @@ import { useRestTimer } from "../hooks/useRestTimer";
 import { notifyRestOver, primeAudio } from "../lib/alert";
 import { fmtNum, plural } from "../lib/format";
 import { progressionHint } from "../lib/progression";
+import { Icon } from "../components/Icon";
 import { RestTimer } from "../components/RestTimer";
 import { ExerciseMedia } from "../components/ExerciseMedia";
 
@@ -133,7 +134,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
   return (
     <main className="app">
       <header className="bar">
-        <button className="link" onClick={() => (done.length > 0 ? setConfirmExit(true) : void leave())}><span aria-hidden="true">‹ </span>Voltar</button>
+        <button className="btn text back" onClick={() => (done.length > 0 ? setConfirmExit(true) : void leave())}><Icon name="back" />Voltar</button>
         <h1>{workout.name}</h1>
       </header>
       <p role="status" className="sr-only">{announce}</p>
@@ -176,7 +177,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
                   )}
                   <button className="check" aria-pressed={d} aria-label={cardio ? "Cardio concluído" : `Série ${i + 1} concluída, ${ex.name}`}
                     onClick={() => toggle(item.exerciseId, i, noInputs, timed ? item.repMax : 0)}>
-                    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" focusable="false"><path fill="currentColor" d={d ? "M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" : "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16z"} /></svg>
+                    <Icon name={d ? "check-circle" : "circle"} size={28} />
                   </button>
                   {err && <p className="error" role="alert">{err}</p>}
                   {prev && !noInputs && <span className="muted prev">Última vez: {fmtNum(prev.weightKg)} kg × {prev.reps}</span>}
@@ -187,14 +188,14 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
         );
       })}
       {rest.active && <RestTimer remaining={rest.remaining} total={rest.total} label={rest.label} onAdjust={rest.adjust} onSkip={rest.skip} />}
-      <button className="primary" onClick={() => void leave()}>Finalizar treino</button>
+      <button className="primary" onClick={() => void leave()}><Icon name="check" />Finalizar treino</button>
       {confirmExit && (
         <div className="overlay">
           <div className="dialog" role="alertdialog" aria-modal="true" aria-labelledby="sair-t" aria-describedby="sair-d">
             <h2 id="sair-t">Sair do treino?</h2>
             <p id="sair-d" className="muted">Suas séries ficam salvas no histórico.</p>
-            <button className="btn" onClick={() => void leave()}>Salvar e sair</button>
-            <button className="btn ghost" autoFocus onClick={() => setConfirmExit(false)}>Continuar treino</button>
+            <button className="btn" onClick={() => void leave()}><Icon name="save" size={20} />Salvar e sair</button>
+            <button className="btn ghost" autoFocus onClick={() => setConfirmExit(false)}><Icon name="play" size={20} />Continuar treino</button>
           </div>
         </div>
       )}

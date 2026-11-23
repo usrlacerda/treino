@@ -1,3 +1,4 @@
+import { Icon } from "../components/Icon";
 import { plural } from "../lib/format";
 import { finishSession, findResumable } from "../db/repo";
 import type { Session } from "../db/types";
@@ -26,14 +27,14 @@ export function Home({ db, onStart, onEdit, onImport, notice }: Props) {
       {update.available && (
         <div className="banner" role="status">
           <span>Nova versão disponível.</span>
-          <button className="btn small" onClick={update.apply}>Atualizar</button>
+          <button className="btn small" onClick={update.apply}><Icon name="refresh" size={18} />Atualizar</button>
         </div>
       )}
       {open && (
         <section className="banner resume" aria-label="Treino em andamento">
           <span>Treino em andamento: <strong>{workouts.find((w) => w.id === open.workoutId)?.name ?? "Treino"}</strong>, {plural(open.sets.length, "série salva", "séries salvas")}.</span>
           <span className="row-actions">
-            <button className="btn small" onClick={() => onStart(open.workoutId, open.id)}>Continuar treino</button>
+            <button className="btn small" onClick={() => onStart(open.workoutId, open.id)}><Icon name="play" size={18} />Continuar treino</button>
             <button className="btn small ghost" onClick={() => void finishSession(db, open.id!).then(() => setOpen(undefined))}>Encerrar e salvar</button>
           </span>
         </section>
@@ -47,10 +48,10 @@ export function Home({ db, onStart, onEdit, onImport, notice }: Props) {
             <span className="muted">{plural(w.items.length, "exercício", "exercícios")}</span>
             {w.id === next && <span className="badge">Próximo</span>}
           </button>
-          <button className="btn ghost edit" aria-label={`Editar ${w.name}`} onClick={() => onEdit(w.id)}>Editar</button>
+          <button className="btn tonal edit" aria-label={`Editar ${w.name}`} onClick={() => onEdit(w.id)}><Icon name="edit" size={20} />Editar</button>
         </div>
       ))}
-      <button className="btn ghost wide" onClick={onImport}>Importar treinos de um arquivo</button>
+      <button className="btn ghost wide" onClick={onImport}><Icon name="download" size={20} />Importar treinos de um arquivo</button>
       <footer className="credits muted">
         Ilustrações: Exercise data by <a href="https://repdb.co" target="_blank" rel="noreferrer nofollow">RepDB</a> (repdb.co)
       </footer>

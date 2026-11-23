@@ -1,3 +1,4 @@
+import { Icon } from "../components/Icon";
 import { useEffect, useMemo, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { addExercise, deleteExercise } from "../db/plan";
@@ -48,13 +49,13 @@ export function Library({ db }: { db: TreinoDB }) {
         <input type="search" value={q} onChange={(e) => setQ(e.target.value)} />
       </label>
       <div className="chips" role="group" aria-label="Filtrar por grupo muscular">
-        <button className="chip" aria-pressed={muscle === ""} onClick={() => setMuscle("")}>Todos</button>
+        <button className="chip" aria-pressed={muscle === ""} onClick={() => setMuscle("")}>{muscle === "" && <Icon name="check" size={18} />}Todos</button>
         {MUSCLES.map((m) => (
-          <button key={m} className="chip" aria-pressed={muscle === m} onClick={() => setMuscle(muscle === m ? "" : m)}>{MUSCLE_LABEL[m]}</button>
+          <button key={m} className="chip" aria-pressed={muscle === m} onClick={() => setMuscle(muscle === m ? "" : m)}>{muscle === m && <Icon name="check" size={18} />}{MUSCLE_LABEL[m]}</button>
         ))}
       </div>
       {error && <p className="error block" role="alert">{error}</p>}
-      {!adding && <button className="btn wide" onClick={() => setAdding(true)}>Novo exercício</button>}
+      {!adding && <button className="btn wide" onClick={() => setAdding(true)}><Icon name="add" size={20} />Novo exercício</button>}
       {adding && (
         <form className="exercise" onSubmit={save} aria-label="Novo exercício">
           <h2>Novo exercício</h2>
@@ -68,7 +69,7 @@ export function Library({ db }: { db: TreinoDB }) {
           <label className="field">Equipamento (opcional)<input value={form.equipment} maxLength={40} onChange={(e) => setForm({ ...form, equipment: e.target.value })} /></label>
           <label className="field">Dica de execução (opcional)<input value={form.cue} maxLength={200} onChange={(e) => setForm({ ...form, cue: e.target.value })} /></label>
           <div className="row-actions">
-            <button type="submit" className="btn">Salvar exercício</button>
+            <button type="submit" className="btn"><Icon name="save" size={20} />Salvar exercício</button>
             <button type="button" className="btn ghost" onClick={() => { setAdding(false); setError(undefined); }}>Cancelar</button>
           </div>
         </form>
@@ -85,7 +86,7 @@ export function Library({ db }: { db: TreinoDB }) {
                 <strong>{e.name}</strong>
                 <span className="muted">{MUSCLE_LABEL[e.muscle]} · {e.equipment}{own && <span className="badge inline">Próprio</span>}</span>
               </div>
-              {own && <button className="link" aria-label={`Apagar ${e.name}`} onClick={() => setToDelete(e)}>Apagar</button>}
+              {own && <button className="btn text danger small" aria-label={`Apagar ${e.name}`} onClick={() => setToDelete(e)}><Icon name="delete" size={18} />Apagar</button>}
             </li>
           );
         })}
@@ -95,7 +96,7 @@ export function Library({ db }: { db: TreinoDB }) {
           <div className="dialog" role="alertdialog" aria-modal="true" aria-labelledby="apg-t">
             <h2 id="apg-t">Apagar “{toDelete.name}”?</h2>
             <p className="muted">Não dá para desfazer.</p>
-            <button className="btn" onClick={() => void confirmDelete()}>Apagar exercício</button>
+            <button className="btn danger" onClick={() => void confirmDelete()}><Icon name="delete" size={20} />Apagar exercício</button>
             <button className="btn ghost" autoFocus onClick={() => setToDelete(undefined)}>Cancelar</button>
           </div>
         </div>

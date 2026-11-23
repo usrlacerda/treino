@@ -1,3 +1,4 @@
+import { Icon } from "./Icon";
 import { formatClock } from "../lib/time";
 
 interface Props { remaining: number; total: number; label: string; onAdjust: (d: number) => void; onSkip: () => void }
@@ -14,7 +15,7 @@ export function RestTimer({ remaining, total, label, onAdjust, onSkip }: Props) 
       <div className="rest-actions">
         <button onClick={() => onAdjust(-15)} aria-label="Menos 15 segundos">−15s</button>
         <button onClick={() => onAdjust(15)} aria-label="Mais 15 segundos">+15s</button>
-        <button onClick={onSkip}>Pular</button>
+        <button onClick={onSkip}><Icon name="skip" size={20} />Pular</button>
       </div>
     </div>
   );
