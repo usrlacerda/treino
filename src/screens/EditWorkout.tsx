@@ -69,7 +69,6 @@ export function EditWorkout({ db, workoutId, onClose, initialExercise }: Props) 
     <main className="app">
       <BrandBar compact />
       <header className="bar">
-        <button className="btn text back" onClick={() => (dirty ? setAskDiscard(true) : onClose())}><Icon name="back" />Cancelar</button>
         <h1>{workoutId === NEW_WORKOUT ? "Novo treino" : "Editar treino"}</h1>
       </header>
       <label className="field">Nome do treino<input value={name} maxLength={40} onChange={(e) => { setName(e.target.value); setError(undefined); }} /></label>

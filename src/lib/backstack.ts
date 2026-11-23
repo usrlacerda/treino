@@ -8,14 +8,17 @@ const stack: Entry[] = [];
 const pending: number[] = []; // entradas de janelas já fechadas, ainda não removidas do histórico (permite trocar uma janela por outra sem mexer nele)
 let counter = 0;
 let ignore = 0; // popstates causados por nós mesmos
+let ignoreAt = 0; // quando foi pedido (um popstate que nunca chega não pode engolir um voltar de verdade depois)
+const skipNext = () => { ignore++; ignoreAt = Date.now(); };
 const dlgOf = () => (history.state as { dlg?: number } | null)?.dlg;
 
 if (typeof window !== "undefined") {
   window.addEventListener("popstate", () => {
-    if (ignore > 0) { ignore--; return; }
+    if (ignore > 0 && Date.now() - ignoreAt < 500) { ignore--; return; }
+    ignore = 0;
     stack.pop()?.close();
     // Caiu numa entrada de janela que já não existe (a tela mudou enquanto ela estava aberta): pula.
-    if (!stack.length && !pending.length && dlgOf()) { ignore++; history.back(); }
+    if (!stack.length && !pending.length && dlgOf()) { skipNext(); history.back(); }
   });
 }
 
@@ -26,7 +29,7 @@ function flush() {
   const liveMax = stack.reduce((m, e) => Math.max(m, e.tok), 0);
   const k = toks.filter((t) => t > liveMax).length;
   if (k === 0 || !toks.includes(dlgOf() ?? -1)) return; // a tela já navegou: a entrada fica e é pulada depois
-  ignore++;
+  skipNext();
   history.go(-k);
 }
 

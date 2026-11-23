@@ -65,7 +65,6 @@ export function Library({ db, onPick, onClose, hide, onAdded, onCreateWorkout }:
 
   const current = GROUPS.find((g) => g.id === group);
   const listMode = !!group || searching;
-  const goBack = () => { if (group) { setGroup(undefined); setEquip(""); setLimit(PAGE); } else onClose?.(); };
   const title = current?.label ?? (onPick ? "Escolher exercício" : "Biblioteca");
 
   return (
@@ -74,7 +73,6 @@ export function Library({ db, onPick, onClose, hide, onAdded, onCreateWorkout }:
         ? (<>
             <BrandBar compact />
             <header className="bar">
-              <button className="btn text back" onClick={goBack}><Icon name="back" />{group ? "Voltar" : "Cancelar"}</button>
               <h1>{title}</h1>
             </header>
           </>)

@@ -1,5 +1,6 @@
 import "fake-indexeddb/auto";
 import { render, screen, within } from "@testing-library/react";
+import { pressBack } from "./testBack";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, vi } from "vitest";
 import { TreinoDB, seedIfEmpty } from "./db/db";
@@ -51,7 +52,7 @@ describe("biblioteca única", () => {
     await user.click(within(screen.getByRole("group", { name: "Filtrar por equipamento" })).getByRole("button", { name: "Halteres" }));
     expect(screen.getByText("1 exercício")).toBeInTheDocument();
     expect(screen.queryByText("Supino reto com barra")).not.toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Voltar" }));
+    await pressBack();
     expect(await screen.findByRole("button", { name: /^Costas\s*0 exercícios/ })).toBeInTheDocument();
   });
 

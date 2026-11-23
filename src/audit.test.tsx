@@ -1,5 +1,6 @@
 import "fake-indexeddb/auto";
 import { act, render, screen, waitFor } from "@testing-library/react";
+import { pressBack } from "./testBack";
 import userEvent from "@testing-library/user-event";
 import { afterEach, vi } from "vitest";
 import { TreinoDB } from "./db/db";
@@ -53,7 +54,7 @@ describe("auditoria: saída do treino", () => {
     render(<App db={db} initialTab="treinos" />);
     await startA(user);
     await logFirst(user, "50", "8");
-    await user.click(screen.getByRole("button", { name: "Voltar" }));
+    await pressBack();
     expect(await screen.findByRole("alertdialog", { name: "Sair do treino?" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Salvar e sair" }));
     expect(await screen.findByText("Treino salvo: 1 série, 400 kg de volume.")).toBeInTheDocument();
@@ -65,7 +66,7 @@ describe("auditoria: saída do treino", () => {
     render(<App db={fresh()} initialTab="treinos" />);
     await startA(user);
     await logFirst(user, "50", "8");
-    await user.click(screen.getByRole("button", { name: "Voltar" }));
+    await pressBack();
     await user.click(await screen.findByRole("button", { name: "Continuar treino" }));
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
     expect(screen.getByLabelText(CARGA)).toHaveValue("50");
@@ -75,7 +76,7 @@ describe("auditoria: saída do treino", () => {
     const user = userEvent.setup();
     render(<App db={db} initialTab="treinos" />);
     await startA(user);
-    await user.click(screen.getByRole("button", { name: "Voltar" }));
+    await pressBack();
     expect(await screen.findByText("Próximo")).toBeInTheDocument();
     expect(await db.sessions.count()).toBe(0);
   });

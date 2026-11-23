@@ -1,5 +1,6 @@
 import "fake-indexeddb/auto";
 import { render, screen, waitFor, within } from "@testing-library/react";
+import { pressBack } from "./testBack";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, vi } from "vitest";
 import { resetCatalogCache } from "./lib/catalog";
@@ -74,7 +75,7 @@ describe("editar treino", () => {
     render(<App db={db} initialTab="treinos" />);
     await openEditA(user);
     await user.click(screen.getByRole("button", { name: "Remover Agachamento no Smith" }));
-    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    await pressBack();
     const ask = await screen.findByRole("alertdialog", { name: "Descartar alterações?" });
     await user.click(within(ask).getByRole("button", { name: "Descartar" }));
     expect(await screen.findByText("Escolha o treino de hoje")).toBeInTheDocument();
@@ -87,12 +88,12 @@ describe("editar treino", () => {
     render(<App db={db} initialTab="treinos" />);
     await openEditA(user);
     await user.click(screen.getByRole("button", { name: "Remover Agachamento no Smith" }));
-    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    await pressBack();
     await user.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Continuar editando" }));
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Editar treino" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: /Agachamento no Smith/ })).not.toBeInTheDocument(); // a remoção continua
-    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    await pressBack();
     await user.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Descartar" }));
     expect(await screen.findByText("Escolha o treino de hoje")).toBeInTheDocument();
   });
@@ -102,7 +103,7 @@ describe("editar treino", () => {
     const user = userEvent.setup();
     render(<App db={db} initialTab="treinos" />);
     await openEditA(user);
-    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    await pressBack();
     expect(await screen.findByText("Escolha o treino de hoje")).toBeInTheDocument();
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
   });
@@ -129,7 +130,7 @@ describe("escolher exercício ao editar o treino", () => {
     await screen.findByRole("heading", { name: "Escolher exercício" });
     await user.type(screen.getByLabelText("Buscar exercício"), "martelo");
     expect(await screen.findByText("Rosca martelo")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    await pressBack();
     expect(await screen.findByRole("heading", { name: "Editar treino" })).toBeInTheDocument();
   });
 });

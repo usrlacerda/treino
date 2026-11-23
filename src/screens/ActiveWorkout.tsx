@@ -35,6 +35,8 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [confirmExit, setConfirmExit] = useState(false);
   useBackClose(confirmExit, () => setConfirmExit(false));
+  // Com séries marcadas, o voltar do aparelho pergunta antes de sair do treino.
+  useBackClose(done.length > 0 && !confirmExit, () => setConfirmExit(true));
   const [zoom, setZoom] = useState<{ id: string; name: string }>();
   const [leaveError, setLeaveError] = useState<string>();
 
@@ -142,7 +144,6 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
     <main className="app">
       <BrandBar compact />
       <header className="bar">
-        <button className="btn text back" onClick={() => (done.length > 0 ? setConfirmExit(true) : void leave())}><Icon name="back" />Voltar</button>
         <h1>{workout.name}</h1>
       </header>
       <p role="status" className="sr-only">{announce}</p>

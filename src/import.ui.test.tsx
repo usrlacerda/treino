@@ -1,5 +1,6 @@
 import "fake-indexeddb/auto";
 import { render, screen, within } from "@testing-library/react";
+import { pressBack } from "./testBack";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, vi } from "vitest";
 import { TreinoDB, seedIfEmpty } from "./db/db";
@@ -79,7 +80,7 @@ describe("importar treinos: tela", () => {
     await user.click(screen.getByRole("button", { name: "Exportar meus treinos" }));
     expect(created).toHaveLength(2);
     expect(JSON.parse(await created[1].text()).workouts).toHaveLength(3);
-    await user.click(screen.getByRole("button", { name: "Voltar" }));
+    await pressBack();
     expect(await screen.findByRole("button", { name: "Importar treinos de um arquivo" })).toBeInTheDocument();
     void within;
   });

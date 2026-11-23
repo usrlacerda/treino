@@ -80,7 +80,7 @@ describe("botão voltar", () => {
     expect(await screen.findByRole("heading", { name: "Treino A" })).toBeInTheDocument();
   });
 
-  it("sair do treino pelo voltar mantém as séries salvas e volta de onde veio", async () => {
+  it("com séries marcadas, o voltar pergunta; voltar de novo continua o treino; 'Salvar e sair' fecha e volta de onde veio", async () => {
     const db = fresh(); await seedIfEmpty(db);
     const user = userEvent.setup();
     render(<App db={db} />);
@@ -90,13 +90,17 @@ describe("botão voltar", () => {
     await user.type(screen.getAllByLabelText(/Carga em kg, série 1/)[0], "30");
     await user.type(screen.getAllByLabelText(/Repetições \(reps\), série 1/)[0], "10");
     await user.click(screen.getAllByRole("button", { name: /Série 1 concluída/ })[0]);
+    await waitFor(() => expect(screen.getAllByRole("button", { name: /Série 1 concluída/ })[0]).toHaveAttribute("aria-pressed", "true"));
     await voltar();
-    expect(await screen.findByRole("region", { name: "Treino em andamento" })).toBeInTheDocument(); // Treinos, com o aviso de retomar
+    expect(await screen.findByRole("alertdialog", { name: "Sair do treino?" })).toBeInTheDocument();
+    await voltar(); // voltar com a pergunta aberta = continuar treino
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+    expect(screen.getByRole("button", { name: "Finalizar treino" })).toBeInTheDocument();
+    await voltar();
+    await user.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Salvar e sair" }));
+    expect(await screen.findByText(/Treino salvo: 1 série/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Treinos" })).toHaveAttribute("aria-current", "page");
-    const open = await db.sessions.toArray();
-    expect(open).toHaveLength(1);
-    expect(open[0].finishedAt).toBeUndefined();
-    expect(open[0].sets).toHaveLength(1);
+    expect((await db.sessions.toArray())[0].finishedAt).toBeDefined();
   });
 
   it("sair do treino sem registrar nada pelo voltar não cria sessão", async () => {

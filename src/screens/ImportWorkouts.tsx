@@ -89,7 +89,6 @@ export function ImportWorkouts({ db, onClose }: Props) {
     <main className="app">
       <BrandBar compact />
       <header className="bar">
-        <button className="btn text back" onClick={() => onClose()}><Icon name="back" />Voltar</button>
         <h1>Importar treinos</h1>
       </header>
 
