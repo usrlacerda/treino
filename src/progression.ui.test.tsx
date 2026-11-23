@@ -24,7 +24,7 @@ describe("progressão dupla na tela", () => {
     const db = new TreinoDB("prog-" + Math.random());
     await seedLast(db, [10, 10, 10]);
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     expect(await screen.findByText(/Hora de subir a carga: 40 → 42 kg/)).toBeInTheDocument();
     expect(screen.getByLabelText("Carga em kg, série 1, Agachamento no Smith")).toHaveValue("42");
@@ -34,7 +34,7 @@ describe("progressão dupla na tela", () => {
     const db = new TreinoDB("prog-" + Math.random());
     await seedLast(db, [10, 8, 6]);
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     expect(await screen.findByText(/ficou abaixo de 8 repetições com 40 kg/)).toBeInTheDocument();
     expect(screen.getByLabelText("Carga em kg, série 1, Agachamento no Smith")).toHaveValue("40");
@@ -43,7 +43,7 @@ describe("progressão dupla na tela", () => {
     const db = new TreinoDB("prog-" + Math.random());
     await seedLast(db, [10, 9, 9]);
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     await screen.findByLabelText("Carga em kg, série 1, Agachamento no Smith");
     expect(screen.queryByRole("note")).not.toBeInTheDocument();

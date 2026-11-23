@@ -4,6 +4,8 @@ import { addToWorkout } from "../db/plan";
 import type { Exercise, Workout } from "../db/types";
 import { plural } from "../lib/format";
 import { Icon } from "./Icon";
+import { useBackClose } from "../lib/useBackClose";
+
 
 interface Props {
   db: TreinoDB;
@@ -17,6 +19,7 @@ interface Props {
 
 /** Escolha do treino que vai receber o exercício: os que já existem ou um novo. */
 export function AddToWorkout({ db, ex, onClose, onAdded, onCreate }: Props) {
+  useBackClose(true, onClose);
   const [workouts, setWorkouts] = useState<Workout[]>();
   const [error, setError] = useState<string>();
   useEffect(() => {

@@ -29,7 +29,7 @@ afterEach(() => vi.useRealTimers());
 describe("auditoria: validação", () => {
   it("avisa o que falta ao concluir série vazia e limpa o aviso ao digitar", async () => {
     const user = userEvent.setup();
-    render(<App db={fresh()} />);
+    render(<App db={fresh()} initialTab="treinos" />);
     await startA(user);
     await user.click(screen.getByRole("button", CONCLUIR));
     expect(await screen.findByRole("alert")).toHaveTextContent("Informe a carga e as repetições para concluir a série.");
@@ -39,7 +39,7 @@ describe("auditoria: validação", () => {
   it("aceita carga 0 digitada (sem peso) e vírgula decimal", async () => {
     const db = fresh();
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await startA(user);
     await logFirst(user, "42,5", "8");
     await waitFor(async () => expect((await db.sessions.toArray())[0].sets[0].weightKg).toBe(42.5));
@@ -50,7 +50,7 @@ describe("auditoria: saída do treino", () => {
   it("Voltar com séries marcadas pergunta e salva ao confirmar, mostrando o resumo", async () => {
     const db = fresh();
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await startA(user);
     await logFirst(user, "50", "8");
     await user.click(screen.getByRole("button", { name: "Voltar" }));
@@ -62,7 +62,7 @@ describe("auditoria: saída do treino", () => {
   });
   it("Continuar treino fecha a pergunta e mantém tudo", async () => {
     const user = userEvent.setup();
-    render(<App db={fresh()} />);
+    render(<App db={fresh()} initialTab="treinos" />);
     await startA(user);
     await logFirst(user, "50", "8");
     await user.click(screen.getByRole("button", { name: "Voltar" }));
@@ -73,7 +73,7 @@ describe("auditoria: saída do treino", () => {
   it("Voltar sem séries sai direto, sem pergunta e sem sessão", async () => {
     const db = fresh();
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await startA(user);
     await user.click(screen.getByRole("button", { name: "Voltar" }));
     expect(await screen.findByText("Próximo")).toBeInTheDocument();
@@ -81,7 +81,7 @@ describe("auditoria: saída do treino", () => {
   });
   it("mostra a 'última vez' com vírgula e preenche o campo igual", async () => {
     const user = userEvent.setup();
-    render(<App db={fresh()} />);
+    render(<App db={fresh()} initialTab="treinos" />);
     await startA(user);
     await logFirst(user, "42,5", "8");
     await user.click(screen.getByRole("button", { name: "Finalizar treino" }));
@@ -102,7 +102,7 @@ describe("auditoria: falhas e atualização", () => {
       },
     });
     const user = userEvent.setup();
-    render(<App db={flaky} />);
+    render(<App db={flaky} initialTab="treinos" />);
     expect(await screen.findByRole("alert")).toHaveTextContent("Não conseguimos abrir seus dados neste navegador.");
     await user.click(screen.getByRole("button", { name: "Tentar de novo" }));
     expect(await screen.findByText("Treino A")).toBeInTheDocument();
@@ -110,7 +110,7 @@ describe("auditoria: falhas e atualização", () => {
   it("versão nova aparece como aviso na tela inicial e só atualiza ao pedir", async () => {
     const apply = vi.fn();
     const user = userEvent.setup();
-    render(<App db={fresh()} />);
+    render(<App db={fresh()} initialTab="treinos" />);
     await screen.findByText("Treino A");
     expect(screen.queryByText(/Nova versão disponível/)).not.toBeInTheDocument();
     act(() => setUpdateAvailable(apply));
@@ -125,7 +125,7 @@ describe("auditoria: leitor de tela", () => {
   it("anuncia o fim do descanso", async () => {
     vi.useFakeTimers({ toFake: ["setInterval", "clearInterval", "Date"] });
     const user = userEvent.setup({ advanceTimers: (ms) => vi.advanceTimersByTime(ms) });
-    render(<App db={fresh()} />);
+    render(<App db={fresh()} initialTab="treinos" />);
     await startA(user);
     await logFirst(user, "40", "8");
     await screen.findByRole("timer");

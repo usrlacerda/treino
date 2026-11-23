@@ -1,4 +1,6 @@
 import { BrandBar } from "../components/Logo";
+import { useBackClose } from "../lib/useBackClose";
+
 import { useEffect, useRef, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { discardSession, finishSession, lastSetsForMany, logSet, startSession, unlogSet } from "../db/repo";
@@ -32,6 +34,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
   const [inputs, setInputs] = useState<Record<string, { w: string; r: string }>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [confirmExit, setConfirmExit] = useState(false);
+  useBackClose(confirmExit, () => setConfirmExit(false));
   const [zoom, setZoom] = useState<{ id: string; name: string }>();
   const [leaveError, setLeaveError] = useState<string>();
 

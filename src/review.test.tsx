@@ -16,7 +16,7 @@ describe("achados da revisão independente", () => {
 
   it("a tela recusa carga/reps que o backup recusaria", async () => {
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     await user.type(await screen.findByLabelText("Carga em kg, série 1, Agachamento no Smith"), "1200");
     await user.type(screen.getByLabelText("Repetições (reps), série 1, Agachamento no Smith"), "8");
@@ -59,7 +59,7 @@ describe("achados da revisão independente", () => {
   });
   it("falha ao gravar mostra mensagem e permite tentar de novo", async () => {
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     await user.type(await screen.findByLabelText("Carga em kg, série 1, Agachamento no Smith"), "40");
     await user.type(screen.getByLabelText("Repetições (reps), série 1, Agachamento no Smith"), "8");
@@ -94,7 +94,7 @@ describe("retomar treino em andamento", () => {
     const id = await startSession(db, "A");
     await logSet(db, id, { exerciseId: ex, setIndex: 0, weightKg: 42.5, reps: 8, doneAt: Date.now() });
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     expect(await screen.findByText(/Treino em andamento/)).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Continuar treino" }));
     const name = (await db.exercises.get(ex))!.name;
@@ -110,7 +110,7 @@ describe("retomar treino em andamento", () => {
     const id = await startSession(db, "A");
     await logSet(db, id, { exerciseId: "ds-1463", setIndex: 0, weightKg: 10, reps: 5, doneAt: Date.now() });
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByRole("button", { name: "Encerrar e salvar" }));
     await waitFor(() => expect(screen.queryByText(/Treino em andamento/)).toBeNull());
     expect((await db.sessions.get(id))?.finishedAt).toBeDefined();

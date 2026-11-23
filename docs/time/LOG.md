@@ -88,3 +88,4 @@
 - Rolagem desnecessária na tela de Treinos: espaço inferior padrão agora é só o da barra de abas (88 px); 170 px apenas em telas com botão fixo/descanso (:has).
 - Janela do exercício: X no canto superior direito (fixo ao rolar) no lugar do botão Fechar; "Adicionar a um treino" flutua no rodapé do card.
 - Logo nas telas do app agora é o mesmo ícone do app instalado (monograma CG sobre degradê).
+- Nova tela Início (primeira aba): treino de hoje com "Começar", semana (dias, treinos, volume vs. semana passada, semanas seguidas) e último treino. Botão voltar do Android: Início é a raiz (de lá fecha o app); outras abas voltam ao Início; telas (treino, edição, importação) e janelas (exercício, confirmações, grupo da Biblioteca) fecham uma por vez; sair do treino pelo voltar mantém as séries (Continuar treino). src/lib/backstack.ts + useBackClose, week.ts.

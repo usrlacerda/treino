@@ -1,13 +1,11 @@
 import { BrandHeader } from "../components/Logo";
 import { Icon } from "../components/Icon";
 import { plural } from "../lib/format";
-import { finishSession, findResumable } from "../db/repo";
-import type { Session } from "../db/types";
+import { TopBanners } from "../components/TopBanners";
 import { useEffect, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { nextWorkoutId } from "../db/repo";
 import type { Workout } from "../db/types";
-import { useUpdate } from "../lib/updater";
 
 interface Props { db: TreinoDB; onStart: (workoutId: string, resumeSessionId?: number) => void; onEdit: (workoutId: string) => void; onNew: () => void; notice?: string }
 
@@ -15,33 +13,16 @@ export function Home({ db, onStart, onEdit, onNew, notice }: Props) {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [names, setNames] = useState<Record<string, string>>({});
   const [next, setNext] = useState<string>();
-  const [open, setOpen] = useState<Session>();
-  const update = useUpdate();
   useEffect(() => {
     db.workouts.orderBy("order").toArray().then(setWorkouts);
     db.exercises.toArray().then((all) => setNames(Object.fromEntries(all.map((e) => [e.id, e.name]))));
     nextWorkoutId(db).then(setNext).catch(() => undefined);
-    findResumable(db).then(setOpen);
   }, [db]);
 
   return (
     <main className="app">
       <BrandHeader title="Treinos" />
-      {update.available && (
-        <div className="banner" role="status">
-          <span>Nova versão disponível. Atualize para usar as novidades.</span>
-          <button className="btn icon update" aria-label="Atualizar" title="Atualizar" onClick={update.apply}><Icon name="refresh" size={22} /></button>
-        </div>
-      )}
-      {open && (
-        <section className="banner resume" aria-label="Treino em andamento">
-          <span>Treino em andamento: <strong>{workouts.find((w) => w.id === open.workoutId)?.name ?? "Treino"}</strong>, {plural(open.sets.length, "série salva", "séries salvas")}.</span>
-          <span className="row-actions">
-            <button className="btn small" onClick={() => onStart(open.workoutId, open.id)}><Icon name="play" size={18} />Continuar treino</button>
-            <button className="btn small ghost" onClick={() => void finishSession(db, open.id!).then(() => setOpen(undefined))}>Encerrar e salvar</button>
-          </span>
-        </section>
-      )}
+      <TopBanners db={db} workouts={workouts} onStart={onStart} />
       {notice && <p className="notice" role="status">{notice}</p>}
       <h2 className="section-title">Escolha o treino de hoje</h2>
       {workouts.map((w) => {

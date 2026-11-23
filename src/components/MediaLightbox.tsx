@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { loadDetails, type Details } from "../lib/details";
 import { Icon } from "./Icon";
+import { useBackClose } from "../lib/useBackClose";
+
 import { animSrc, hasAnim, mediaSrc, prefersReducedMotion } from "../lib/media";
 
 /** Janela com a demonstração do exercício em tamanho grande. Fecha com o botão, tocando fora ou com Esc. */
 export function MediaLightbox({ id, name, onClose, children }: { id: string; name: string; onClose: () => void; /** botões de ação (ex.: adicionar a um treino) flutuam no rodapé do card */ children?: React.ReactNode }) {
+  useBackClose(true, onClose);
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", h);

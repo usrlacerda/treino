@@ -26,7 +26,7 @@ describe("editar treino", () => {
   it("muda séries, reordena, remove e adiciona; o treino ativo reflete a mudança", async () => {
     const db = fresh();
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await openEditA(user);
 
     const series = screen.getByLabelText("Séries, Agachamento no Smith");
@@ -59,7 +59,7 @@ describe("editar treino", () => {
   it("mostra o erro e não salva quando o mínimo de repetições passa do máximo", async () => {
     const db = fresh();
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await openEditA(user);
     const min = screen.getByLabelText("Mínimo de repetições, Abdominal na máquina");
     await user.clear(min); await user.type(min, "20");
@@ -71,7 +71,7 @@ describe("editar treino", () => {
   it("Cancelar descarta as mudanças", async () => {
     const db = fresh();
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await openEditA(user);
     await user.click(screen.getByRole("button", { name: "Remover Agachamento no Smith" }));
     await user.click(screen.getByRole("button", { name: "Cancelar" }));
@@ -82,7 +82,7 @@ describe("editar treino", () => {
   it("cardio edita a duração", async () => {
     const db = fresh();
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await openEditA(user);
     const d = screen.getByLabelText("Duração em minutos, Esteira inclinada");
     await user.clear(d); await user.type(d, "20");
@@ -95,7 +95,7 @@ describe("editar treino", () => {
 describe("escolher exercício ao editar o treino", () => {
   it("esconde o que já está no treino e permite cancelar", async () => {
     const user = userEvent.setup();
-    render(<App db={fresh()} />);
+    render(<App db={fresh()} initialTab="treinos" />);
     await openEditA(user);
     await user.click(screen.getByRole("button", { name: "Adicionar exercício" }));
     await screen.findByRole("heading", { name: "Escolher exercício" });
@@ -110,7 +110,7 @@ describe("novo treino", () => {
   it("cria um treino do zero pelo botão Novo treino", async () => {
     const db = new TreinoDB("nt-" + Math.random()); await seedIfEmpty(db);
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByRole("button", { name: "Novo treino" }));
     expect(await screen.findByRole("heading", { name: "Novo treino" })).toBeInTheDocument();
     await user.type(screen.getByLabelText("Nome do treino"), "Treino D");

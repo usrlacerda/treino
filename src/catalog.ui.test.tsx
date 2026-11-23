@@ -26,7 +26,7 @@ beforeEach(() => {
 
 async function openLibrary(user: ReturnType<typeof userEvent.setup>) {
   const db = fresh(); await seedIfEmpty(db);
-  render(<App db={db} />);
+  render(<App db={db} initialTab="treinos" />);
   await user.click(await screen.findByRole("button", { name: "Biblioteca" }));
   await screen.findByRole("heading", { name: "Biblioteca" });
   return db;

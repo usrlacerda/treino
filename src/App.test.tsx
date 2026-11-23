@@ -10,7 +10,7 @@ const fresh = () => new TreinoDB("app-" + Math.random());
 
 describe("App", () => {
   it("mostra os treinos e sugere o A na primeira vez", async () => {
-    render(<App db={fresh()} />);
+    render(<App db={fresh()} initialTab="treinos" />);
     expect(await screen.findByRole("heading", { name: "Treinos" })).toBeInTheDocument();
     expect(await screen.findByText("Treino A")).toBeInTheDocument();
     expect(await screen.findByText("Próximo")).toBeInTheDocument();
@@ -19,7 +19,7 @@ describe("App", () => {
   it("registra uma série, grava no banco e mostra 'última vez' no treino seguinte", async () => {
     const db = fresh();
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
 
     await user.type(await screen.findByLabelText("Carga em kg, série 1, Agachamento no Smith"), "40");
@@ -39,7 +39,7 @@ describe("App", () => {
 
   it("inicia o descanso ao concluir série (50s no agachamento) e permite pular", async () => {
     const user = userEvent.setup();
-    render(<App db={fresh()} />);
+    render(<App db={fresh()} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     await user.type(await screen.findByLabelText("Carga em kg, série 1, Agachamento no Smith"), "40");
     await user.type(screen.getByLabelText("Repetições (reps), série 1, Agachamento no Smith"), "8");
@@ -54,7 +54,7 @@ describe("App", () => {
   it("sair sem registrar nada não cria sessão", async () => {
     const db = fresh();
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     await user.click(await screen.findByRole("button", { name: "Finalizar treino" }));
     expect(await screen.findByText("Próximo")).toBeInTheDocument();
@@ -63,7 +63,7 @@ describe("App", () => {
 
   it("histórico mostra recorde, gráfico e treino feito depois de finalizar", async () => {
     const user = userEvent.setup();
-    render(<App db={fresh()} />);
+    render(<App db={fresh()} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     await user.type(await screen.findByLabelText("Carga em kg, série 1, Agachamento no Smith"), "50");
     await user.type(screen.getByLabelText("Repetições (reps), série 1, Agachamento no Smith"), "8");
@@ -78,7 +78,7 @@ describe("App", () => {
 
   it("mostra a demonstração animada do exercício", async () => {
     const user = userEvent.setup();
-    render(<App db={fresh()} />);
+    render(<App db={fresh()} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     const thumb = await screen.findByRole("button", { name: "Ampliar demonstração de Agachamento no Smith" });
     expect(thumb.querySelector("img")).toHaveAttribute("src", "/catalog/anim/0770.webp");
@@ -89,7 +89,7 @@ describe("App", () => {
   it("não registra série com repetições vazias", async () => {
     const db = fresh();
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     await user.click(await screen.findByRole("button", { name: "Série 1 concluída, Agachamento no Smith" }));
     expect(await db.sessions.count()).toBe(0);

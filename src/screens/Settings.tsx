@@ -1,3 +1,4 @@
+import { useBackClose } from "../lib/useBackClose";
 import { BrandHeader } from "../components/Logo";
 import { useEffect, useState } from "react";
 import type { TreinoDB } from "../db/db";
@@ -19,6 +20,7 @@ interface Props { db: TreinoDB; onImported: (summary: string) => void; onImportW
 export function Settings({ db, onImported, onImportWorkouts }: Props) {
   const [msg, setMsg] = useState<{ ok: boolean; text: string }>();
   const [pending, setPending] = useState<Backup>();
+  useBackClose(!!pending, () => setPending(undefined));
   const [current, setCurrent] = useState<string>();
   const [last, setLast] = useState(readLast);
   async function doExport() {

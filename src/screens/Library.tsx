@@ -1,4 +1,5 @@
 import { BrandBar, BrandHeader } from "../components/Logo";
+import { useBackClose } from "../lib/useBackClose";
 import { BodyFigure } from "../components/BodyFigure";
 import { Icon } from "../components/Icon";
 import { AddToWorkout } from "../components/AddToWorkout";
@@ -36,6 +37,8 @@ export function Library({ db, onPick, onClose, hide, onAdded, onCreateWorkout }:
   const [limit, setLimit] = useState(PAGE);
   const [zoom, setZoom] = useState<{ id: string; name: string; ex: Exercise }>();
   const [adding, setAdding] = useState<Exercise>();
+  useBackClose(!!onPick, () => onClose?.());
+  useBackClose(!!group, () => { setGroup(undefined); setEquip(""); setLimit(PAGE); });
 
   useEffect(() => {
     let alive = true;

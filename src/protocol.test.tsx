@@ -50,7 +50,7 @@ describe("treinos idênticos ao protocolo", () => {
   it("prancha é por tempo: sem campos de carga, registra os segundos e inicia o descanso de 50 s", async () => {
     const db = new TreinoDB("pr2-" + Math.random()); await seedIfEmpty(db);
     const user = userEvent.setup();
-    render(<App db={db} />);
+    render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByRole("button", { name: /^Treino B/ }));
     expect(await screen.findByText("30 s")).toBeInTheDocument();
     expect(screen.getAllByText("descanso 50s").length).toBeGreaterThan(0);

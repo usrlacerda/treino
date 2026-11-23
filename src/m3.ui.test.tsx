@@ -10,14 +10,14 @@ vi.mock("./lib/alert", () => ({ notifyRestOver: vi.fn(), primeAudio: vi.fn() }))
 describe("ajustes finais", () => {
   it("histórico vazio leva aos Treinos", async () => {
     const user = userEvent.setup();
-    render(<App db={new TreinoDB("m3-" + Math.random())} />);
+    render(<App db={new TreinoDB("m3-" + Math.random())} initialTab="treinos" />);
     await user.click(await screen.findByRole("button", { name: "Histórico" }));
     await user.click(await screen.findByRole("button", { name: "Ir para Treinos" }));
     expect(await screen.findByRole("button", { name: /^Treino A/ })).toBeInTheDocument();
   });
   it("botão da série mantém o nome e alterna aria-pressed; timer mostra progresso", async () => {
     const user = userEvent.setup();
-    render(<App db={new TreinoDB("m3b-" + Math.random())} />);
+    render(<App db={new TreinoDB("m3b-" + Math.random())} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     await user.type(await screen.findByLabelText("Carga em kg, série 1, Agachamento no Smith"), "40");
     await user.type(screen.getByLabelText("Repetições (reps), série 1, Agachamento no Smith"), "8");
@@ -28,10 +28,10 @@ describe("ajustes finais", () => {
     const timer = await screen.findByRole("timer");
     expect(timer.querySelector(".rest-bar div")).toHaveStyle({ width: "100%" });
   });
-  it("a barra de navegação tem 4 destinos com ícones decorativos", async () => {
-    render(<App db={new TreinoDB("m3c-" + Math.random())} />);
+  it("a barra de navegação tem 5 destinos com ícones decorativos", async () => {
+    render(<App db={new TreinoDB("m3c-" + Math.random())} initialTab="treinos" />);
     const nav = await screen.findByRole("navigation", { name: "Navegação" });
-    expect(nav.querySelectorAll("button")).toHaveLength(4);
-    expect(nav.querySelectorAll("svg[aria-hidden='true']")).toHaveLength(4);
+    expect(nav.querySelectorAll("button")).toHaveLength(5);
+    expect(nav.querySelectorAll("svg[aria-hidden='true']")).toHaveLength(5);
   });
 });
