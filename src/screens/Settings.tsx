@@ -13,7 +13,6 @@ const readLast = (): number | undefined => { try { const v = Number(localStorage
 const saveLast = (t: number) => { try { localStorage.setItem(KEY, String(t)); } catch { /* sem armazenamento */ } };
 
 
-import { clearUserFont, hasUserFont, saveUserFont } from "../lib/userFont";
 
 interface Props { db: TreinoDB; onImported: (summary: string) => void; onImportWorkouts: () => void }
 
@@ -22,18 +21,6 @@ export function Settings({ db, onImported, onImportWorkouts }: Props) {
   const [pending, setPending] = useState<Backup>();
   const [current, setCurrent] = useState<string>();
   const [last, setLast] = useState(readLast);
-  const [hasFont, setHasFont] = useState(false);
-  useEffect(() => { void hasUserFont().then(setHasFont).catch(() => undefined); }, []);
-  async function onFont(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = [...(e.target.files ?? [])]; e.target.value = "";
-    try {
-      const n = await saveUserFont(files);
-      setHasFont(n > 0);
-      setMsg(n > 0 ? { ok: true, text: `Fonte aplicada (${n} ${n === 1 ? "arquivo" : "arquivos"}).` } : { ok: false, text: "Escolha arquivos de fonte (.ttf, .otf ou .woff2)." });
-    } catch { setMsg({ ok: false, text: "Não conseguimos usar essa fonte. Tente outro arquivo." }); }
-  }
-  async function removeFont() { await clearUserFont(); setHasFont(false); setMsg({ ok: true, text: "Fonte removida. O app voltou à fonte padrão." }); }
-
   async function doExport() {
     try {
       const data = await exportData(db);
@@ -78,14 +65,6 @@ export function Settings({ db, onImported, onImportWorkouts }: Props) {
         <h2 id="tr-h">Treinos</h2>
         <p className="muted">Adicione treinos de um arquivo, sem apagar os que você já tem.</p>
         <button className="btn ghost wide" onClick={onImportWorkouts}><Icon name="download" size={20} />Importar treinos de um arquivo</button>
-      </section>
-      <section className="exercise" aria-labelledby="ft-h">
-        <h2 id="ft-h">Fonte</h2>
-        <p className="muted">Escolha os arquivos de uma fonte (Regular, Medium, Bold…). Eles ficam só neste aparelho, fora do site e do backup.</p>
-        <label className="btn ghost wide filebtn"><Icon name="download" size={20} />Escolher arquivos de fonte
-          <input type="file" multiple accept=".ttf,.otf,.woff,.woff2,font/*" onChange={(e) => void onFont(e)} />
-        </label>
-        {hasFont && <button className="btn ghost wide" onClick={() => void removeFont()}>Voltar à fonte padrão</button>}
       </section>
       <section className="exercise" aria-labelledby="bk-h">
         <h2 id="bk-h">Backup</h2>

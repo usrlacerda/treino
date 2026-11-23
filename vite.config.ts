@@ -31,13 +31,13 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,png,webp}"],
+        globPatterns: ["**/*.{js,css,html,svg,png,webp,woff2}"],
         globIgnores: ["catalog/**"], // catálogo grande: baixa sob demanda e fica em cache para uso offline
         // os exercícios do protocolo inicial já ficam disponíveis offline desde a instalação
         additionalManifestEntries: seedIds.flatMap((n) => [`catalog/img/${n}.webp`, `catalog/anim/${n}.webp`].map((url) => ({ url, revision: "1" }))),
         runtimeCaching: [
           { urlPattern: ({ url }) => url.pathname.includes("/catalog/img/") || url.pathname.includes("/catalog/anim/"), handler: "CacheFirst", options: { cacheName: "catalog-img", expiration: { maxEntries: 3000, maxAgeSeconds: 60 * 60 * 24 * 365 } } },
-          { urlPattern: ({ url }) => url.pathname.endsWith("/catalog/index.json"), handler: "StaleWhileRevalidate", options: { cacheName: "catalog-index" } },
+          { urlPattern: ({ url }) => url.pathname.endsWith("/catalog/index.json"), handler: "NetworkFirst", options: { cacheName: "catalog-index", networkTimeoutSeconds: 4 } },
         ],
       },
     }),

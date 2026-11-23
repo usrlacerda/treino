@@ -1,3 +1,4 @@
+@font-face { font-family: "Montserrat Variable"; font-style: normal; font-display: swap; font-weight: 100 900; src: url("@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2") format("woff2-variations"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
 :root { color-scheme: dark light;
   --bg:#14121a; --surface:#1d1b24; --surface-high:#2a2733; --line:#38353f; --outline:#948f9f; --text:#e8e3ee; --muted:#b4afbf;
   --accent:#ff6f00; --on-accent:#14121a; --magenta:#d81b60; --on-magenta:#ffffff; --ok:#4ade80; --on-ok:#06210f; --err:#fca5a5; --err-line:#f87171;
@@ -7,7 +8,7 @@
   --accent:#4f148a; --on-accent:#ffffff; --magenta:#d81b60; --on-magenta:#ffffff; --ok:#1e7a3c; --on-ok:#ffffff; --err:#a3201d; --err-line:#b3261e;
   --notice-bg:#e3f5e8; --notice-line:#9bd1ab; --notice-text:#12391f; --banner-bg:#e9e0fb; --ok-text:#12391f; --err-fill:#b3261e; --on-err-fill:#ffffff; } }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-user, system-ui), system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: Gotham, "Gotham SSm", "Montserrat Variable", system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
 .app { padding: 16px 16px 96px; max-width: 640px; margin: 0 auto; }
 h1 { font-size: 1.6rem; margin: 8px 0; }
 h2 { font-size: 1.1rem; margin: 0 0 4px; }
