@@ -221,3 +221,13 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 .set { padding: 8px 0; }
 .set.done .set-n { color: var(--ok); }
 @media (prefers-reduced-motion: reduce) { .check { transition: none; } .check:active { transform: none; } }
+
+/* ===== Padronização de espaçamentos ===== */
+/* texto seguido de botões e botões empilhados dentro de cartões */
+.exercise p + .btn, .exercise p + .row-actions, .exercise .muted + .btn { margin-top: 14px; }
+.exercise .btn.wide + .btn.wide, .exercise .btn + .btn.wide { margin-top: 10px; }
+/* edição: coluna de descanso um pouco maior para o rótulo não quebrar */
+.grid4 { grid-template-columns: .85fr 1fr 1fr 1.25fr; }
+/* título e botão de voltar sempre alinhados ao topo da página */
+.bar { margin-bottom: 4px; }
+.bar h1 { margin: 0; font-size: 1.5rem; }

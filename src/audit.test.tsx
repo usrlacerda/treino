@@ -111,9 +111,9 @@ describe("auditoria: falhas e atualização", () => {
     const user = userEvent.setup();
     render(<App db={fresh()} />);
     await screen.findByText("Treino A");
-    expect(screen.queryByText("Nova versão disponível.")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Nova versão disponível/)).not.toBeInTheDocument();
     act(() => setUpdateAvailable(apply));
-    expect(await screen.findByText("Nova versão disponível.")).toBeInTheDocument();
+    expect(await screen.findByText(/Nova versão disponível/)).toBeInTheDocument();
     expect(apply).not.toHaveBeenCalled();
     await user.click(screen.getByRole("button", { name: "Atualizar" }));
     expect(apply).toHaveBeenCalledTimes(1);

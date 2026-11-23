@@ -29,7 +29,7 @@ let cache: Promise<CatalogItem[]> | undefined;
 /** Baixa o índice uma vez (fica no cache do service worker para uso offline). */
 export function loadCatalog(): Promise<CatalogItem[]> {
   cache ??= fetch(`${import.meta.env.BASE_URL}catalog/index.json`)
-    .then((r) => { if (!r.ok) throw new Error("Não foi possível carregar o catálogo."); return r.json() as Promise<CatalogRow[]>; })
+    .then((r) => { if (!r.ok) throw new Error("Não conseguimos carregar o catálogo."); return r.json() as Promise<CatalogRow[]>; })
     .then((rows) => rows.map(toItem))
     .catch((e) => { cache = undefined; throw e; });
   return cache;

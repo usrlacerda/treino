@@ -38,7 +38,7 @@ describe("ajustes: backup", () => {
     const user = userEvent.setup();
     render(<App db={db} />);
     await openSettings(user);
-    expect(screen.getByText("Você ainda não fez backup.")).toBeInTheDocument();
+    expect(screen.getByText("Você ainda não exportou nenhum backup.")).toBeInTheDocument();
     const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
     await user.click(screen.getByRole("button", { name: "Exportar backup" }));
     expect(click).toHaveBeenCalledTimes(1);
@@ -106,6 +106,6 @@ describe("ajustes: backup", () => {
     await openSettings(user);
     expect(screen.getByText(/consulte um profissional/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Gym visual" })).toHaveAttribute("href", "https://gymvisual.com/");
-    expect(screen.getByText(/não envia seus dados para nenhum servidor/)).toBeInTheDocument();
+    expect(screen.getByText(/não envia seus dados a nenhum servidor/)).toBeInTheDocument();
   });
 });

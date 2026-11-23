@@ -35,14 +35,16 @@ export function Catalog({ db, onClose }: { db: TreinoDB; onClose: () => void }) 
     const ex = toExercise(c);
     await db.exercises.put(ex);
     setHave((h) => new Set(h).add(ex.id));
-    setMsg(`“${c.name}” foi adicionado à sua biblioteca.`);
+    setMsg(`Adicionado à Biblioteca: ${c.name}.`);
   }
 
   return (
     <main className="app">
-      <button className="btn text back" onClick={onClose}><Icon name="back" />Voltar</button>
-      <h1>Catálogo de exercícios</h1>
-      <p className="muted">Escolha exercícios para adicionar à sua biblioteca e depois monte seus treinos. Os nomes estão em inglês.</p>
+      <header className="bar">
+        <button className="btn text back" onClick={onClose}><Icon name="back" />Voltar</button>
+        <h1>Catálogo</h1>
+      </header>
+      <p className="muted">Adicione exercícios à sua Biblioteca para usá-los nos treinos. Os nomes estão em inglês.</p>
       <label className="field">Buscar no catálogo
         <input type="search" value={q} onChange={(e) => { setQ(e.target.value); setLimit(PAGE); }} />
       </label>
@@ -52,10 +54,10 @@ export function Catalog({ db, onClose }: { db: TreinoDB; onClose: () => void }) 
           <button key={m} className="chip" aria-pressed={muscle === m} onClick={() => { setMuscle(muscle === m ? "" : m); setLimit(PAGE); }}>{muscle === m && <Icon name="check" size={18} />}{MUSCLE_LABEL[m]}</button>
         ))}
       </div>
-      {failed && <p className="error block" role="alert">{failed} Conecte-se à internet uma vez para baixar o catálogo.</p>}
+      {failed && <p className="error block" role="alert">Não conseguimos carregar o catálogo. Conecte-se à internet e tente de novo.</p>}
       {!items && !failed && <p className="muted" role="status">Carregando catálogo…</p>}
       {msg && <p className="notice" role="status">{msg}</p>}
-      {items && <p className="muted" aria-live="polite">{shown.length === 1 ? "1 exercício" : `${shown.length} exercícios`}</p>}
+      {items && <p className="muted" aria-live="polite">{shown.length === 1 ? "1 exercício" : `${shown.length.toLocaleString("pt-BR")} exercícios`}</p>}
       {items && shown.length === 0 && <p className="muted">Nenhum exercício encontrado. Mude a busca ou o filtro.</p>}
       <ul className="lib-list">
         {shown.slice(0, limit).map((c) => {
@@ -70,7 +72,7 @@ export function Catalog({ db, onClose }: { db: TreinoDB; onClose: () => void }) 
                 <span className="muted">{MUSCLE_LABEL[c.muscle]} · {equipmentPt(c.equipment)} · {targetPt(c.target)}</span>
               </div>
               {added
-                ? <span className="badge inline"><Icon name="check" size={16} />Na biblioteca</span>
+                ? <span className="badge inline"><Icon name="check" size={16} />Adicionado</span>
                 : <button className="btn tonal small" aria-label={`Adicionar ${c.name}`} onClick={() => void add(c)}><Icon name="add" size={18} />Adicionar</button>}
             </li>
           );

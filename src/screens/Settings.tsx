@@ -62,8 +62,8 @@ export function Settings({ db, onImported }: Props) {
       <h1>Ajustes</h1>
       <section className="exercise" aria-labelledby="bk-h">
         <h2 id="bk-h">Backup</h2>
-        <p className="muted">Seus treinos ficam só neste aparelho. Exporte um arquivo de tempos em tempos para não perder o histórico se limpar o navegador ou trocar de celular.</p>
-        <p className="muted">{last ? `Último backup: ${formatDateFull(last)}.` : "Você ainda não fez backup."}</p>
+        <p className="muted">Seus dados ficam só neste aparelho. Exporte um backup de vez em quando para não perder o histórico se limpar o navegador ou trocar de celular.</p>
+        <p className="muted">{last ? `Último backup: ${formatDateFull(last)}.` : "Você ainda não exportou nenhum backup."}</p>
         <button className="btn wide" onClick={() => void doExport()}><Icon name="upload" size={20} />Exportar backup</button>
         <label className="btn ghost wide filebtn"><Icon name="download" size={20} />Importar backup
           <input type="file" accept="application/json,.json" onChange={(e) => void onFile(e)} />
@@ -72,9 +72,9 @@ export function Settings({ db, onImported }: Props) {
       </section>
       <section className="exercise" aria-labelledby="sb-h">
         <h2 id="sb-h">Sobre</h2>
-        <p className="muted">Treino {pkg.version}. O app funciona sem internet e não envia seus dados para nenhum servidor.</p>
+        <p className="muted">Treino {pkg.version}. O app funciona sem internet e não envia seus dados a nenhum servidor. Só o catálogo de exercícios precisa de conexão na primeira vez que você o abre.</p>
         <p className="muted">Estas orientações são gerais. Se tiver dor ou alguma condição de saúde, consulte um profissional antes de treinar.</p>
-        <p className="muted">Demonstrações dos exercícios: dados hasaneyldrm/exercises-dataset, imagens © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a> (abre em nova aba).</p>
+        <p className="muted">Imagens dos exercícios: © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a> (abre em nova aba). Dados: hasaneyldrm/exercises-dataset.</p>
       </section>
       {pending && (
         <div className="overlay">

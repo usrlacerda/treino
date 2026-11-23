@@ -8,7 +8,7 @@ export function RestTimer({ remaining, total, label, onAdjust, onSkip }: Props) 
   return (
     <div className="rest" role="timer" aria-live="off" aria-label="Descanso">
       <div className="rest-main">
-        <div className="rest-label muted">Descanso · {label}</div>
+        <div className="rest-label muted">Descanso<span className="sr-only"> · {label}</span></div>
         <div className="rest-clock">{formatClock(remaining)}</div>
         <div className="rest-bar" aria-hidden="true"><div style={{ width: `${pct}%` }} /></div>
       </div>

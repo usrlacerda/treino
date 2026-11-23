@@ -28,7 +28,7 @@ async function openCatalog(user: ReturnType<typeof userEvent.setup>) {
   render(<App db={db} />);
   await user.click(await screen.findByRole("button", { name: "Biblioteca" }));
   await user.click(await screen.findByRole("button", { name: /Explorar catálogo/ }));
-  await screen.findByRole("heading", { name: "Catálogo de exercícios" });
+  await screen.findByRole("heading", { name: "Catálogo" });
   return db;
 }
 
@@ -40,7 +40,7 @@ describe("catálogo de exercícios", () => {
     await user.type(screen.getByLabelText("Buscar no catálogo"), "BENCH");
     expect(await screen.findByText("1 exercício")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Adicionar barbell bench press" }));
-    expect(await screen.findByText("Na biblioteca")).toBeInTheDocument();
+    expect(await screen.findByText("Adicionado")).toBeInTheDocument();
     const ex = await db.exercises.get("ds-0002");
     expect(ex).toMatchObject({ name: "barbell bench press", muscle: "peito", equipment: "Barra" });
     await user.click(screen.getByRole("button", { name: "Voltar" }));
@@ -60,7 +60,7 @@ describe("catálogo de exercícios", () => {
     vi.stubGlobal("fetch", vi.fn(async () => ({ ok: false })));
     const user = userEvent.setup();
     await openCatalog(user);
-    expect(await screen.findByRole("alert")).toHaveTextContent("Não foi possível carregar o catálogo");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Não conseguimos carregar o catálogo");
   });
 });
 

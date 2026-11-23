@@ -11,7 +11,7 @@ const fresh = () => new TreinoDB("app-" + Math.random());
 describe("App", () => {
   it("mostra os treinos e sugere o A na primeira vez", async () => {
     render(<App db={fresh()} />);
-    expect(await screen.findByRole("heading", { name: "Treino" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Treinos" })).toBeInTheDocument();
     expect(await screen.findByText("Treino A")).toBeInTheDocument();
     expect(await screen.findByText("Próximo")).toBeInTheDocument();
   });

@@ -84,7 +84,7 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
       <div className="exercise">
         <label className="field">Adicionar exercício
           <select value={pick} onChange={(e) => setPick(e.target.value)}>
-            <option value="">Escolha…</option>
+            <option value="">Escolha um exercício…</option>
             {available.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
           </select>
         </label>

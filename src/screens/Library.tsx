@@ -79,7 +79,7 @@ export function Library({ db }: { db: TreinoDB }) {
         </form>
       )}
       <p className="muted" aria-live="polite">{shown.length === 1 ? "1 exercício" : `${shown.length} exercícios`}</p>
-      {shown.length === 0 && <p className="muted">Nenhum exercício encontrado. Tire o filtro ou crie um novo.</p>}
+      {shown.length === 0 && <p className="muted">Nenhum exercício encontrado. Mude a busca, limpe o filtro ou crie um novo.</p>}
       <ul className="lib-list">
         {shown.map((e) => {
           const own = /^(custom|ds)-/.test(e.id);
@@ -99,7 +99,7 @@ export function Library({ db }: { db: TreinoDB }) {
         <div className="overlay">
           <div className="dialog" role="alertdialog" aria-modal="true" aria-labelledby="apg-t">
             <h2 id="apg-t">Apagar “{toDelete.name}”?</h2>
-            <p className="muted">Não dá para desfazer.</p>
+            <p className="muted">Ele sai da Biblioteca. Não dá para desfazer.</p>
             <button className="btn danger" onClick={() => void confirmDelete()}><Icon name="delete" size={20} />Apagar exercício</button>
             <button className="btn ghost" autoFocus onClick={() => setToDelete(undefined)}>Cancelar</button>
           </div>

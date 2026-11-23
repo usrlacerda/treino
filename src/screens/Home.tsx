@@ -23,10 +23,10 @@ export function Home({ db, onStart, onEdit, onImport, notice }: Props) {
 
   return (
     <main className="app">
-      <h1>Treino</h1>
+      <h1>Treinos</h1>
       {update.available && (
         <div className="banner" role="status">
-          <span>Nova versão disponível.</span>
+          <span>Nova versão disponível. Atualize para usar as novidades.</span>
           <button className="btn small" onClick={update.apply}><Icon name="refresh" size={18} />Atualizar</button>
         </div>
       )}
@@ -53,7 +53,7 @@ export function Home({ db, onStart, onEdit, onImport, notice }: Props) {
       ))}
       <button className="btn ghost wide" onClick={onImport}><Icon name="download" size={20} />Importar treinos de um arquivo</button>
       <footer className="credits muted">
-        Demonstrações: dados hasaneyldrm/exercises-dataset, imagens © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a>
+        Imagens dos exercícios: © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a>
       </footer>
     </main>
   );
