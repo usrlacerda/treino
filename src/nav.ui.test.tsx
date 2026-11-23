@@ -54,7 +54,7 @@ describe("Início", () => {
     const user = userEvent.setup();
     render(<App db={db} />);
     await user.click(await screen.findByRole("button", { name: /Começar treino/ }));
-    expect(await screen.findByRole("button", { name: "Finalizar treino" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Treino A" })).toBeInTheDocument();
   });
 });
 
@@ -86,7 +86,7 @@ describe("botão voltar", () => {
     render(<App db={db} />);
     await user.click(await tab("Treinos"));
     await user.click(await screen.findByRole("button", { name: /^Treino A/ }));
-    await screen.findByRole("button", { name: "Finalizar treino" });
+    await screen.findByRole("heading", { name: "Treino A" });
     await user.type(screen.getAllByLabelText(/Carga em kg, série 1/)[0], "30");
     await user.type(screen.getAllByLabelText(/Repetições \(reps\), série 1/)[0], "10");
     await user.click(screen.getAllByRole("button", { name: /Série 1 concluída/ })[0]);
@@ -95,7 +95,7 @@ describe("botão voltar", () => {
     expect(await screen.findByRole("alertdialog", { name: "Sair do treino?" })).toBeInTheDocument();
     await voltar(); // voltar com a pergunta aberta = continuar treino
     await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
-    expect(screen.getByRole("button", { name: "Finalizar treino" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Treino A" })).toBeInTheDocument();
     await voltar();
     await user.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Salvar e sair" }));
     expect(await screen.findByText(/Treino salvo: 1 série/)).toBeInTheDocument();
@@ -108,7 +108,7 @@ describe("botão voltar", () => {
     const user = userEvent.setup();
     render(<App db={db} />);
     await user.click(await screen.findByRole("button", { name: /Começar treino/ }));
-    await screen.findByRole("button", { name: "Finalizar treino" });
+    await screen.findByRole("heading", { name: "Treino A" });
     await voltar();
     expect(await screen.findByRole("heading", { name: "Treino A" })).toBeInTheDocument();
     expect(await db.sessions.count()).toBe(0);

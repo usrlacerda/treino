@@ -389,3 +389,7 @@ button, input, select, textarea { font-family: inherit; }
 .session-row p { margin: 2px 0 0; }
 .snackbar { position: fixed; left: 16px; right: 16px; bottom: calc(64px + env(safe-area-inset-bottom) + 16px); z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 8px 8px 18px; border-radius: 16px; background: var(--text); color: var(--bg); box-shadow: 0 4px 16px #0006; }
 .snackbar .btn { color: inherit; }
+
+/* Treino ativo: descartar fica no fim da página (o Finalizar é fixo no rodapé); adicionar série */
+.btn.discard { display: flex; width: 100%; margin: 8px 0 0; background: transparent; color: var(--err, #ffb4ab); border: 1px solid var(--err, #ffb4ab); }
+.add-set { margin-top: 8px; }

@@ -1,5 +1,5 @@
 import "fake-indexeddb/auto";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TreinoDB } from "./db/db";
 import { App } from "./App";
@@ -31,7 +31,7 @@ describe("App", () => {
       expect(s[0].sets).toEqual([expect.objectContaining({ exerciseId: "ds-0770", setIndex: 0, weightKg: 40, reps: 8 })]);
     });
 
-    await user.click(screen.getByRole("button", { name: "Finalizar treino" }));
+    await user.click(await screen.findByRole("button", { name: "Finalizar treino" }));
     expect(await screen.findByText("Próximo")).toBeInTheDocument();
     await user.click(await screen.findByText("Treino A"));
     expect(await screen.findByText("Última vez: 40 kg × 8")).toBeInTheDocument();
@@ -56,8 +56,9 @@ describe("App", () => {
     const user = userEvent.setup();
     render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
-    await user.click(await screen.findByRole("button", { name: "Finalizar treino" }));
-    expect(await screen.findByText("Próximo")).toBeInTheDocument();
+    await screen.findByRole("heading", { name: "Treino A" });
+    expect(screen.queryByRole("button", { name: "Finalizar treino" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Descartar treino" })).not.toBeInTheDocument();
     expect(await db.sessions.count()).toBe(0);
   });
 
@@ -68,7 +69,7 @@ describe("App", () => {
     await user.type(await screen.findByLabelText("Carga em kg, série 1, Agachamento no Smith"), "50");
     await user.type(screen.getByLabelText("Repetições (reps), série 1, Agachamento no Smith"), "8");
     await user.click(screen.getByRole("button", { name: "Série 1 concluída, Agachamento no Smith" }));
-    await user.click(screen.getByRole("button", { name: "Finalizar treino" }));
+    await user.click(await screen.findByRole("button", { name: "Finalizar treino" }));
     await screen.findByText("Escolha o treino de hoje");
     await user.click(await screen.findByRole("button", { name: "Histórico" }));
     expect(await screen.findByText("50 kg × 8")).toBeInTheDocument();
@@ -92,6 +93,45 @@ describe("App", () => {
     render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByText("Treino A"));
     await user.click(await screen.findByRole("button", { name: "Série 1 concluída, Agachamento no Smith" }));
+    expect(await db.sessions.count()).toBe(0);
+  });
+});
+
+describe("validações do treino ativo", () => {
+  async function open() {
+    const db = fresh();
+    const user = userEvent.setup();
+    render(<App db={db} initialTab="treinos" />);
+    await user.click(await screen.findByText("Treino A"));
+    await screen.findByRole("heading", { name: "Treino A" });
+    return { db, user };
+  }
+  const mark = async (user: ReturnType<typeof userEvent.setup>, w: string, r: string) => {
+    await user.type(await screen.findByLabelText("Carga em kg, série 1, Agachamento no Smith"), w);
+    await user.type(screen.getByLabelText("Repetições (reps), série 1, Agachamento no Smith"), r);
+    await user.click(screen.getByRole("button", { name: "Série 1 concluída, Agachamento no Smith" }));
+  };
+
+  it("adicionar série cria uma linha a mais só naquele exercício", async () => {
+    const { user } = await open();
+    const sec = screen.getByRole("region", { name: "Agachamento no Smith" });
+    const antes = within(sec).getAllByRole("button", { name: /Série \d+ concluída/ }).length;
+    await user.click(within(sec).getByRole("button", { name: "Adicionar série" }));
+    expect(within(sec).getAllByRole("button", { name: /Série \d+ concluída/ })).toHaveLength(antes + 1);
+    expect(within(sec).getByLabelText(`Carga em kg, série ${antes + 1}, Agachamento no Smith`)).toBeInTheDocument();
+  });
+
+  it("descartar treino pergunta e, ao confirmar, apaga a sessão", async () => {
+    const { db, user } = await open();
+    await mark(user, "50", "8");
+    await user.click(await screen.findByRole("button", { name: "Descartar treino" }));
+    const ask = await screen.findByRole("alertdialog", { name: "Descartar este treino?" });
+    await user.click(within(ask).getByRole("button", { name: "Continuar treino" }));
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+    expect(await db.sessions.count()).toBe(1);
+    await user.click(screen.getByRole("button", { name: "Descartar treino" }));
+    await user.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Descartar treino" }));
+    expect(await screen.findByText("Próximo")).toBeInTheDocument();
     expect(await db.sessions.count()).toBe(0);
   });
 });

@@ -10,6 +10,7 @@ import { notifyRestOver, primeAudio } from "../lib/alert";
 import { fmtNum, plural } from "../lib/format";
 import { progressionHint } from "../lib/progression";
 import { Icon } from "../components/Icon";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import { RestTimer } from "../components/RestTimer";
 import { ExerciseMedia } from "../components/ExerciseMedia";
 import { MediaLightbox } from "../components/MediaLightbox";
@@ -34,9 +35,11 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
   const [inputs, setInputs] = useState<Record<string, { w: string; r: string }>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [confirmExit, setConfirmExit] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
   useBackClose(confirmExit, () => setConfirmExit(false));
   // Com séries marcadas, o voltar do aparelho pergunta antes de sair do treino.
-  useBackClose(done.length > 0 && !confirmExit, () => setConfirmExit(true));
+  useBackClose(done.length > 0 && !confirmExit && !confirmDiscard, () => setConfirmExit(true));
+  const [extra, setExtra] = useState<Record<string, number>>({});
   const [zoom, setZoom] = useState<{ id: string; name: string }>();
   const [leaveError, setLeaveError] = useState<string>();
 
@@ -122,6 +125,18 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
     if (item && item.restSec > 0) { setAnnounce(""); rest.start(item.restSec, lib[ex]?.name ?? ""); }
   }
 
+  /** Séries do exercício: as do plano, as adicionadas agora e as já registradas (treino retomado). */
+  const setsOf = (ex: string, planned: number) =>
+    Math.max(planned + (extra[ex] ?? 0), ...done.filter((d) => d.exerciseId === ex).map((d) => d.setIndex + 1));
+
+  async function discard() {
+    try {
+      const id = await sessionRef.current;
+      if (id !== undefined) await discardSession(db, id);
+      onExit();
+    } catch { setLeaveError(SAVE_FAILED); setConfirmDiscard(false); }
+  }
+
   /** Salva o que foi feito e sai. Sem nenhuma série marcada, descarta a sessão. */
   async function leave() {
     try { await leaveInner(); } catch { setLeaveError(SAVE_FAILED); setConfirmExit(false); }
@@ -155,16 +170,17 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
         const timed = !!ex.timed;
         const cardio = !!item.durationMin;
         const noInputs = cardio || timed;
-        const doneCount = Array.from({ length: item.sets }, (_, i) => isDone(item.exerciseId, i)).filter(Boolean).length;
+        const total = setsOf(item.exerciseId, item.sets);
+        const doneCount = Array.from({ length: total }, (_, i) => isDone(item.exerciseId, i)).filter(Boolean).length;
         return (
-          <section key={n} className={"exercise ex-card" + (doneCount === item.sets ? " all-done" : "")} aria-label={ex.name}>
+          <section key={n} className={"exercise ex-card" + (doneCount === total ? " all-done" : "")} aria-label={ex.name}>
             <div className="ex-head">
-              <span className="ex-num" aria-hidden="true">{doneCount === item.sets ? <Icon name="check" size={18} /> : n + 1}</span>
+              <span className="ex-num" aria-hidden="true">{doneCount === total ? <Icon name="check" size={18} /> : n + 1}</span>
               <div className="ex-title">
                 <h2>{ex.name}</h2>
                 <div className="ex-chips">
                   {cardio ? <span className="chip-info">{item.durationMin} min</span> : <>
-                    <span className="chip-info">{item.sets} séries</span>
+                    <span className="chip-info">{total} séries</span>
                     <span className="chip-info">{timed ? `${item.repMax} s` : item.repMin === item.repMax ? `${item.repMin} reps` : `${item.repMin}-${item.repMax} reps`}</span>
                     <span className="chip-info">descanso {item.restSec}s</span>
                   </>}
@@ -181,7 +197,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
                 : <p className="hint" role="note">Na última vez alguma série ficou abaixo de {h.repMin} repetições com {fmtNum(h.weightKg)} kg. Mantenha ou reduza a carga hoje.</p>;
             })()}
             <div className="sets">
-            {Array.from({ length: item.sets }, (_, i) => {
+            {Array.from({ length: total }, (_, i) => {
               const v = valueOf(item.exerciseId, i);
               const prev = last[item.exerciseId]?.[i];
               const d = isDone(item.exerciseId, i);
@@ -207,12 +223,22 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
               );
             })}
             </div>
+            {!cardio && <button className="btn ghost small add-set" onClick={() => setExtra((e) => ({ ...e, [item.exerciseId]: total - item.sets + 1 }))}><Icon name="add" size={18} />Adicionar série</button>}
           </section>
         );
       })}
       {rest.active && <RestTimer remaining={rest.remaining} total={rest.total} label={rest.label} onAdjust={rest.adjust} onSkip={rest.skip} />}
       {zoom && <MediaLightbox id={zoom.id} name={zoom.name} onClose={() => setZoom(undefined)} />}
-      <button className="primary" onClick={() => void leave()}><Icon name="check" />Finalizar treino</button>
+      {done.length > 0 && (
+        <>
+          <button className="primary" onClick={() => void leave()}><Icon name="check" />Finalizar treino</button>
+          <button className="btn discard" onClick={() => setConfirmDiscard(true)}><Icon name="delete" size={20} />Descartar treino</button>
+        </>
+      )}
+      {confirmDiscard && (
+        <ConfirmDialog title="Descartar este treino?" text={`As ${plural(done.length, "série", "séries")} deste treino não serão salvas. Não dá para desfazer.`}
+          confirmLabel="Descartar treino" cancelLabel="Continuar treino" danger onConfirm={() => void discard()} onCancel={() => setConfirmDiscard(false)} />
+      )}
       {confirmExit && (
         <div className="overlay">
           <div className="dialog" role="alertdialog" aria-modal="true" aria-labelledby="sair-t" aria-describedby="sair-d">
