@@ -209,3 +209,15 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 .thumb { padding: 0; border: 0; background: none; border-radius: 10px; flex: none; width: 56px; height: 56px; cursor: pointer; }
 .thumb img { display: block; border-radius: 10px; }
 .thumb:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* ===== Treino ativo: botão Finalizar e botão de concluir série ===== */
+/* a regra genérica de camada de toque (position: relative) tirava o botão do rodapé; fixa de novo */
+.primary { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); width: auto; max-width: 608px; margin: 0 auto; font-size: 1.05rem; box-shadow: 0 -8px 24px var(--bg), 0 4px 12px #0007; }
+@media (min-width: 700px) { .primary { left: calc(var(--rail) + 16px); } }
+/* concluir série: quadrado arredondado grande; vazio = contorno com check apagado, feito = verde cheio */
+.check { width: 56px; height: 56px; border-radius: 16px; border: 2px solid var(--outline); background: transparent; color: color-mix(in srgb, var(--text) 45%, transparent); transition: background-color .15s, color .15s, transform .1s; }
+.check:active { transform: scale(.94); }
+.check[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); color: var(--on-ok); }
+.set { padding: 8px 0; }
+.set.done .set-n { color: var(--ok); }
+@media (prefers-reduced-motion: reduce) { .check { transition: none; } .check:active { transform: none; } }

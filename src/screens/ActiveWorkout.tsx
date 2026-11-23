@@ -177,7 +177,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
                   )}
                   <button className="check" aria-pressed={d} aria-label={cardio ? "Cardio concluído" : `Série ${i + 1} concluída, ${ex.name}`}
                     onClick={() => toggle(item.exerciseId, i, noInputs, timed ? item.repMax : 0)}>
-                    <Icon name={d ? "check-circle" : "circle"} size={28} />
+                    <Icon name="check" size={30} />
                   </button>
                   {err && <p className="error" role="alert">{err}</p>}
                   {prev && !noInputs && <span className="muted prev">Última vez: {fmtNum(prev.weightKg)} kg × {prev.reps}</span>}
