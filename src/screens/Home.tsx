@@ -30,7 +30,7 @@ export function Home({ db, onStart, onEdit, onNew, notice }: Props) {
       {update.available && (
         <div className="banner" role="status">
           <span>Nova versão disponível. Atualize para usar as novidades.</span>
-          <button className="btn small" onClick={update.apply}><Icon name="refresh" size={18} />Atualizar</button>
+          <button className="btn icon update" aria-label="Atualizar" title="Atualizar" onClick={update.apply}><Icon name="refresh" size={22} /></button>
         </div>
       )}
       {open && (

@@ -336,3 +336,5 @@ button, input, select, textarea { font-family: inherit; }
 .sets .set .error { grid-column: 1 / -1; margin: 2px 0 0; }
 .sets .set:has(> .check:only-of-type):not(:has(input)) { grid-template-columns: 1fr 56px; }
 .sets .set.done .set-n { color: var(--text); }
+.btn.icon.update { flex: none; background: var(--accent); color: var(--on-accent); border-radius: 50%; width: 44px; height: 44px; min-width: 44px; min-height: 44px; }
+.banner span { min-width: 0; }
