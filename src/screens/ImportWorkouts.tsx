@@ -1,3 +1,4 @@
+import { BrandBar } from "../components/Logo";
 import { useEffect, useMemo, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { applyImport, buildPreview, exportPlan, parsePlanText, planTemplate, PlanImportError, suggestName, type ImportPreview } from "../db/planImport";
@@ -86,6 +87,7 @@ export function ImportWorkouts({ db, onClose }: Props) {
 
   return (
     <main className="app">
+      <BrandBar compact />
       <header className="bar">
         <button className="btn text back" onClick={() => onClose()}><Icon name="back" />Voltar</button>
         <h1>Importar treinos</h1>

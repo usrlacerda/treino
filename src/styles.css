@@ -249,3 +249,10 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 @media (prefers-color-scheme: light) { .primary { background: linear-gradient(90deg, #4f148a, #d81b60); color: #ffffff; } }
 .badge.inline { background: var(--surface-high); color: var(--text); }
 .brand { margin-bottom: 6px; }
+
+/* ===== Cabeçalho de marca ===== */
+.brandbar { display: flex; align-items: center; gap: 12px; padding: 8px 0 12px; }
+.brand-name { font-size: 1.5rem; font-weight: 800; letter-spacing: .01em; color: var(--text); }
+.bar-logo { margin-left: auto; display: flex; }
+.brandbar.compact { padding: 0 0 6px; gap: 8px; }
+.brandbar.compact .brand-name { font-size: 1.05rem; }

@@ -1,3 +1,4 @@
+import { BrandBar } from "../components/Logo";
 import { useEffect, useRef, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { discardSession, finishSession, lastSetsForMany, logSet, startSession, unlogSet } from "../db/repo";
@@ -133,6 +134,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
 
   return (
     <main className="app">
+      <BrandBar compact />
       <header className="bar">
         <button className="btn text back" onClick={() => (done.length > 0 ? setConfirmExit(true) : void leave())}><Icon name="back" />Voltar</button>
         <h1>{workout.name}</h1>

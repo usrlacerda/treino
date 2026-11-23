@@ -1,4 +1,4 @@
-import { Logo } from "../components/Logo";
+import { BrandHeader } from "../components/Logo";
 import { Icon } from "../components/Icon";
 import { plural } from "../lib/format";
 import { finishSession, findResumable } from "../db/repo";
@@ -24,7 +24,7 @@ export function Home({ db, onStart, onEdit, onImport, notice }: Props) {
 
   return (
     <main className="app">
-      <div className="brand"><Logo size={40} /><h1>Treinos</h1></div>
+      <BrandHeader title="Treinos" />
       {update.available && (
         <div className="banner" role="status">
           <span>Nova versão disponível. Atualize para usar as novidades.</span>

@@ -1,3 +1,4 @@
+import { BrandHeader } from "../components/Logo";
 import { useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { backupFileName, exportData, importBackup, isBackupError, MAX_BACKUP_BYTES, parseBackupText, type Backup } from "../db/backup";
@@ -59,7 +60,7 @@ export function Settings({ db, onImported }: Props) {
 
   return (
     <main className="app">
-      <h1>Ajustes</h1>
+      <BrandHeader title="Ajustes" />
       <section className="exercise" aria-labelledby="bk-h">
         <h2 id="bk-h">Backup</h2>
         <p className="muted">Seus dados ficam só neste aparelho. Exporte um backup de vez em quando para não perder o histórico se limpar o navegador ou trocar de celular.</p>

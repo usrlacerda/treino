@@ -1,3 +1,4 @@
+import { BrandBar } from "../components/Logo";
 import { useEffect, useMemo, useState } from "react";
 import { Icon } from "../components/Icon";
 import type { TreinoDB } from "../db/db";
@@ -40,6 +41,7 @@ export function Catalog({ db, onClose }: { db: TreinoDB; onClose: () => void }) 
 
   return (
     <main className="app">
+      <BrandBar compact />
       <header className="bar">
         <button className="btn text back" onClick={onClose}><Icon name="back" />Voltar</button>
         <h1>Catálogo</h1>

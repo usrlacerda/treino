@@ -15,3 +15,17 @@ export function Logo({ size = 32 }: { size?: number }) {
     </svg>
   );
 }
+
+/** Cabeçalho de marca das telas principais: o nome da tela fica na barra de baixo, então o título vira texto só para leitor de tela. */
+export function BrandBar({ compact = false }: { compact?: boolean }) {
+  return <div className={"brandbar" + (compact ? " compact" : "")}><Logo size={compact ? 32 : 44} /><span className="brand-name">Corre Gordo</span></div>;
+}
+
+export function BrandHeader({ title }: { title: string }) {
+  return (
+    <>
+      <BrandBar />
+      <h1 className="sr-only">{title}</h1>
+    </>
+  );
+}

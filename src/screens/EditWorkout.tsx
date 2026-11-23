@@ -1,3 +1,4 @@
+import { BrandBar } from "../components/Logo";
 import { Icon } from "../components/Icon";
 import { useEffect, useState } from "react";
 import type { TreinoDB } from "../db/db";
@@ -52,6 +53,7 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
 
   return (
     <main className="app">
+      <BrandBar compact />
       <header className="bar">
         <button className="btn text back" onClick={() => onClose()}><Icon name="back" />Cancelar</button>
         <h1>Editar treino</h1>

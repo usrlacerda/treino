@@ -1,3 +1,4 @@
+import { BrandHeader } from "../components/Logo";
 import { Icon } from "../components/Icon";
 import { useEffect, useMemo, useState } from "react";
 import type { TreinoDB } from "../db/db";
@@ -34,7 +35,7 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
   if (!sessions) return <main className="app"><p className="muted">Carregando…</p></main>;
   if (!sessions.length) return (
     <main className="app">
-      <h1>Histórico</h1>
+      <BrandHeader title="Histórico" />
       <section className="empty" aria-label="Histórico vazio">
         <span className="empty-icon" aria-hidden="true"><Icon name="history" size={40} /></span>
         <h2>Nenhum treino finalizado</h2>
@@ -47,7 +48,7 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
   const rec = current ? personalRecords(sessions, current) : null;
   return (
     <main className="app">
-      <h1>Histórico</h1>
+      <BrandHeader title="Histórico" />
       {current && (
         <section className="exercise">
           <h2>Progresso por exercício</h2>

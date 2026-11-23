@@ -1,3 +1,4 @@
+import { BrandHeader } from "../components/Logo";
 import { Catalog } from "./Catalog";
 import { Icon } from "../components/Icon";
 import { useEffect, useMemo, useState } from "react";
@@ -47,7 +48,7 @@ export function Library({ db }: { db: TreinoDB }) {
   if (browsing) return <Catalog db={db} onClose={() => { setBrowsing(false); void reload(); }} />;
   return (
     <main className="app">
-      <h1>Biblioteca</h1>
+      <BrandHeader title="Biblioteca" />
       <label className="field">Buscar exercício
         <input type="search" value={q} onChange={(e) => setQ(e.target.value)} />
       </label>
