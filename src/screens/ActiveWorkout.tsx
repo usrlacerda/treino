@@ -56,6 +56,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
   const key = (ex: string, i: number) => `${ex}:${i}`;
   const isDone = (ex: string, i: number) => done.some((d) => d.exerciseId === ex && d.setIndex === i);
   const hintFor = (ex: string) => {
+    if (lib[ex]?.timed) return null;
     const item = workout!.items.find((it) => it.exerciseId === ex);
     return item ? progressionHint(item, last[ex] ?? []) : null;
   };
@@ -81,11 +82,11 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
     return sessionRef.current;
   }
 
-  async function toggle(ex: string, i: number, cardio: boolean) {
-    try { await toggleInner(ex, i, cardio); } catch { setErrors((e) => ({ ...e, [key(ex, i)]: SAVE_FAILED })); }
+  async function toggle(ex: string, i: number, cardio: boolean, fixedReps = 0) {
+    try { await toggleInner(ex, i, cardio, fixedReps); } catch { setErrors((e) => ({ ...e, [key(ex, i)]: SAVE_FAILED })); }
   }
 
-  async function toggleInner(ex: string, i: number, cardio: boolean) {
+  async function toggleInner(ex: string, i: number, cardio: boolean, fixedReps: number) {
     if (isDone(ex, i)) {
       await unlogSet(db, await ensureSession(), ex, i);
       setDone((d) => d.filter((x) => !(x.exerciseId === ex && x.setIndex === i)));
@@ -94,7 +95,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
     const v = valueOf(ex, i);
     const w = v.w.trim().replace(",", ".");
     const weightKg = cardio ? 0 : w === "" ? NaN : Number(w);
-    const reps = cardio ? 0 : Number(v.r);
+    const reps = cardio ? fixedReps : Number(v.r);
     if (!cardio && (!Number.isFinite(weightKg) || weightKg < 0 || !Number.isInteger(reps) || reps <= 0)) {
       setErrors((e) => ({ ...e, [key(ex, i)]: MISSING }));
       return;
@@ -108,7 +109,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
     setDone((d) => [...d.filter((x) => !(x.exerciseId === ex && x.setIndex === i)), set]);
     const item = workout!.items.find((it) => it.exerciseId === ex);
     primeAudio();
-    if (item && !cardio) { setAnnounce(""); rest.start(item.restSec, lib[ex]?.name ?? ""); }
+    if (item && item.restSec > 0) { setAnnounce(""); rest.start(item.restSec, lib[ex]?.name ?? ""); }
   }
 
   /** Salva o que foi feito e sai. Sem nenhuma série marcada, descarta a sessão. */
@@ -136,15 +137,18 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
         <h1>{workout.name}</h1>
       </header>
       <p role="status" className="sr-only">{announce}</p>
+      <p className="muted">Comece com 3 a 5 minutos de aquecimento leve.</p>
       {leaveError && <p className="error block" role="alert">{leaveError}</p>}
       {workout.items.map((item, n) => {
         const ex = lib[item.exerciseId];
         if (!ex) return null;
+        const timed = !!ex.timed;
         const cardio = !!item.durationMin;
+        const noInputs = cardio || timed;
         return (
           <section key={n} className="exercise" aria-label={ex.name}>
             <h2>{n + 1}. {ex.name}</h2>
-            <p className="muted">{cardio ? `${item.durationMin} min` : `${item.sets} séries · ${item.repMin === item.repMax ? item.repMin : `${item.repMin}-${item.repMax}`} reps · descanso ${item.restSec}s`}</p>
+            <p className="muted">{cardio ? `${item.durationMin} min` : timed ? `${item.sets} séries · ${item.repMax} s · descanso ${item.restSec}s` : `${item.sets} séries · ${item.repMin === item.repMax ? item.repMin : `${item.repMin}-${item.repMax}`} reps · descanso ${item.restSec}s`}</p>
             <ExerciseMedia id={ex.id} name={ex.name} />
             <p className="cue">{ex.cue}</p>
             {(() => {
@@ -162,7 +166,7 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
               return (
                 <div key={i} className={"set" + (d ? " done" : "")}>
                   <span className="set-n">{cardio ? "Cardio" : `Série ${i + 1}`}</span>
-                  {!cardio && (
+                  {!noInputs && (
                     <>
                       <label>kg<input aria-label={`Carga em kg, série ${i + 1}, ${ex.name}`} inputMode="decimal" value={v.w} disabled={d}
                         aria-invalid={err ? true : undefined} onChange={(e) => setInput(item.exerciseId, i, { w: e.target.value })} /></label>
@@ -171,11 +175,11 @@ export function ActiveWorkout({ db, workoutId, resumeSessionId, onExit }: Props)
                     </>
                   )}
                   <button className="check" aria-pressed={d} aria-label={cardio ? "Cardio concluído" : `Série ${i + 1} concluída, ${ex.name}`}
-                    onClick={() => toggle(item.exerciseId, i, cardio)}>
+                    onClick={() => toggle(item.exerciseId, i, noInputs, timed ? item.repMax : 0)}>
                     <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" focusable="false"><path fill="currentColor" d={d ? "M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" : "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16z"} /></svg>
                   </button>
                   {err && <p className="error" role="alert">{err}</p>}
-                  {prev && !cardio && <span className="muted prev">Última vez: {fmtNum(prev.weightKg)} kg × {prev.reps}</span>}
+                  {prev && !noInputs && <span className="muted prev">Última vez: {fmtNum(prev.weightKg)} kg × {prev.reps}</span>}
                 </div>
               );
             })}

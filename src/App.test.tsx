@@ -37,7 +37,7 @@ describe("App", () => {
     expect(await screen.findByText("Última vez: 40 kg × 8")).toBeInTheDocument();
   });
 
-  it("inicia o descanso ao concluir série (90s no agachamento) e permite pular", async () => {
+  it("inicia o descanso ao concluir série (50s no agachamento) e permite pular", async () => {
     const user = userEvent.setup();
     render(<App db={fresh()} />);
     await user.click(await screen.findByText("Treino A"));
@@ -46,7 +46,7 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Série 1 concluída, Agachamento no Smith" }));
     const timer = await screen.findByRole("timer");
     expect(timer).toHaveTextContent("Descanso · Agachamento no Smith");
-    expect(timer).toHaveTextContent("1:30");
+    expect(timer).toHaveTextContent("0:50");
     await user.click(screen.getByRole("button", { name: "Pular" }));
     expect(screen.queryByRole("timer")).not.toBeInTheDocument();
   });

@@ -67,8 +67,8 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
             ) : (
               <div className="grid4">
                 <label className="field small">Séries<input inputMode="numeric" aria-label={`Séries, ${nm}`} value={r.sets} onChange={(e) => patch(i, { sets: e.target.value })} /></label>
-                <label className="field small">Mín. reps<input inputMode="numeric" aria-label={`Mínimo de repetições, ${nm}`} value={r.repMin} onChange={(e) => patch(i, { repMin: e.target.value })} /></label>
-                <label className="field small">Máx. reps<input inputMode="numeric" aria-label={`Máximo de repetições, ${nm}`} value={r.repMax} onChange={(e) => patch(i, { repMax: e.target.value })} /></label>
+                <label className="field small">{ex?.timed ? "Mín. segundos" : "Mín. reps"}<input inputMode="numeric" aria-label={`${ex?.timed ? "Mínimo de segundos" : "Mínimo de repetições"}, ${nm}`} value={r.repMin} onChange={(e) => patch(i, { repMin: e.target.value })} /></label>
+                <label className="field small">{ex?.timed ? "Máx. segundos" : "Máx. reps"}<input inputMode="numeric" aria-label={`${ex?.timed ? "Máximo de segundos" : "Máximo de repetições"}, ${nm}`} value={r.repMax} onChange={(e) => patch(i, { repMax: e.target.value })} /></label>
                 <label className="field small">Descanso (s)<input inputMode="numeric" aria-label={`Descanso em segundos, ${nm}`} value={r.restSec} onChange={(e) => patch(i, { restSec: e.target.value })} /></label>
               </div>
             )}

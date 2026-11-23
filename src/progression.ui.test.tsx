@@ -10,6 +10,10 @@ vi.mock("./lib/alert", () => ({ notifyRestOver: vi.fn(), primeAudio: vi.fn() }))
 
 async function seedLast(db: TreinoDB, reps: number[], weight = 40) {
   await seedIfEmpty(db);
+  // faixa de 8 a 10 repetições para exercitar a progressão dupla
+  const a = (await db.workouts.get("A"))!;
+  a.items = a.items.map((i) => (i.exerciseId === "agach-smith" ? { ...i, repMin: 8, repMax: 10 } : i));
+  await db.workouts.put(a);
   const id = await startSession(db, "A");
   for (let i = 0; i < reps.length; i++) await logSet(db, id, { exerciseId: "agach-smith", setIndex: i, weightKg: weight, reps: reps[i], doneAt: i + 1 });
   await finishSession(db, id);

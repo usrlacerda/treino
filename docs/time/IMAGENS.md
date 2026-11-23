@@ -28,3 +28,6 @@ Substitui as fotos da free-exercise-db usadas antes.
 - cardio <- Treadmill Running (treadmill-running), 1 imagem(ns)
 
 Aproximações: supino inclinado na máquina -> Machine Chest Press (reto); panturrilha no leg press -> Machine Calf Raise; cardio tem 1 só imagem.
+
+- prancha <- Plank (plank), 1 imagem(ns)
+- desenv-maquina <- Machine Shoulder Press (machine-shoulder-press), 2 imagem(ns)

@@ -8,6 +8,7 @@ export interface Exercise {
   muscle: Muscle;
   equipment: string;
   cue: string; // dica curta de execução
+  timed?: boolean; // exercício por tempo: "repetições" são segundos (ex.: prancha)
 }
 
 export interface PlanItem {

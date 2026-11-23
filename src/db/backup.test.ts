@@ -31,7 +31,7 @@ describe("backup: ida e volta", () => {
     const sessions = await other.sessions.toArray();
     expect(sessions).toHaveLength(1);
     expect(sessions[0].sets[0].weightKg).toBe(42.5);
-    expect(await other.exercises.count()).toBe(23); // 22 padrão + 1 próprio
+    expect(await other.exercises.count()).toBe(25); // 24 padrão + 1 próprio
   });
   it("só exporta exercícios próprios (os padrão vêm do app)", async () => {
     await withData();
@@ -44,7 +44,7 @@ describe("backup: ida e volta", () => {
     await seedIfEmpty(empty);
     await importBackup(db, parseBackup(clone(await exportData(empty))));
     expect(await db.sessions.count()).toBe(0);
-    expect(await db.exercises.count()).toBe(22);
+    expect(await db.exercises.count()).toBe(24);
   });
   it("nome do arquivo com data", () => {
     expect(backupFileName(new Date("2026-11-22T12:00:00Z"))).toBe("treino-backup-2026-11-22.json");
