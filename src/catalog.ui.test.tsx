@@ -67,6 +67,48 @@ describe("biblioteca única", () => {
     expect(screen.getByText("1 exercício")).toBeInTheDocument();
   });
 
+  it("adiciona o exercício a um treino que já existe e vai para a tela de Treinos", async () => {
+    const user = userEvent.setup();
+    const db = await openLibrary(user);
+    await user.click(await screen.findByRole("button", { name: /^Peito\s*2 exercícios/ }));
+    await user.click(await screen.findByText("Supino reto com barra"));
+    await user.click(await screen.findByRole("button", { name: "Adicionar a um treino" }));
+    expect(await screen.findByRole("dialog", { name: "Adicionar a um treino" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Adicionar ao Treino A" }));
+    expect(await screen.findByText("Supino reto com barra foi adicionado ao Treino A.")).toBeInTheDocument();
+    expect(await screen.findByText("Escolha o treino de hoje")).toBeInTheDocument();
+    const a = (await db.workouts.get("A"))!;
+    expect(a.items.at(-1)).toMatchObject({ exerciseId: "ds-0002", sets: 3, repMin: 8, repMax: 12, restSec: 60 });
+    expect(await db.exercises.get("ds-0002")).toBeDefined();
+  });
+
+  it("não deixa adicionar de novo o exercício que o treino já tem", async () => {
+    const user = userEvent.setup();
+    const db = await openLibrary(user);
+    await db.workouts.put({ ...(await db.workouts.get("A"))!, items: [{ exerciseId: "ds-0002", sets: 3, repMin: 8, repMax: 12, restSec: 60 }] });
+    await user.click(await screen.findByRole("button", { name: /^Peito\s*2 exercícios/ }));
+    await user.click(await screen.findByText("Supino reto com barra"));
+    await user.click(await screen.findByRole("button", { name: "Adicionar a um treino" }));
+    expect(await screen.findByRole("button", { name: "Treino A, já tem este exercício" })).toBeDisabled();
+  });
+
+  it("cria um treino novo já começando pelo exercício", async () => {
+    const user = userEvent.setup();
+    const db = await openLibrary(user);
+    await user.click(await screen.findByRole("button", { name: /^Peito\s*2 exercícios/ }));
+    await user.click(await screen.findByText("Supino reto com barra"));
+    await user.click(await screen.findByRole("button", { name: "Adicionar a um treino" }));
+    await user.click(await screen.findByRole("button", { name: "Criar treino novo com este exercício" }));
+    expect(await screen.findByRole("heading", { name: "Novo treino" })).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: "Supino reto com barra" })).toBeInTheDocument();
+    await user.type(screen.getByLabelText("Nome do treino"), "Peito extra");
+    await user.click(screen.getByRole("button", { name: "Salvar alterações" }));
+    expect(await screen.findByText("Peito extra salvo.")).toBeInTheDocument();
+    const all = await db.workouts.toArray();
+    expect(all).toHaveLength(4);
+    expect(all.find((w) => w.name === "Peito extra")!.items.map((i) => i.exerciseId)).toEqual(["ds-0002"]);
+  });
+
   it("avisa quando os exercícios não carregam e mostra o que está salvo", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => ({ ok: false })));
     const user = userEvent.setup();

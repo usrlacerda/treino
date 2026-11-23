@@ -62,3 +62,21 @@ export async function deleteExercise(db: TreinoDB, id: string): Promise<void> {
     throw new Error("Este exercício tem histórico e não pode ser apagado.");
   await db.exercises.delete(id);
 }
+
+/** Valores iniciais ao pôr um exercício num treino: cardio por minutos, exercício por tempo em segundos, os demais 3 × 8-12. */
+export function defaultItem(ex: Exercise): PlanItem {
+  if (ex.muscle === "cardio") return { exerciseId: ex.id, sets: 1, repMin: 0, repMax: 0, restSec: 0, durationMin: 15 };
+  if (ex.timed) return { exerciseId: ex.id, sets: 3, repMin: 30, repMax: 30, restSec: 60 };
+  return { exerciseId: ex.id, sets: 3, repMin: 8, repMax: 12, restSec: 60 };
+}
+
+/** Põe o exercício (do catálogo ou próprio) no fim de um treino que já existe. */
+export async function addToWorkout(db: TreinoDB, workoutId: string, ex: Exercise): Promise<Workout> {
+  const w = await db.workouts.get(workoutId);
+  if (!w) throw new Error("Treino não encontrado.");
+  if (w.items.some((i) => i.exerciseId === ex.id)) throw new Error("Este exercício já está no treino.");
+  if (!(await db.exercises.get(ex.id))) await db.exercises.put(ex);
+  const next = { ...w, items: [...w.items, defaultItem(ex)] };
+  await saveWorkout(db, next);
+  return next;
+}

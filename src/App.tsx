@@ -9,6 +9,7 @@ import { Settings } from "./screens/Settings";
 import { ImportWorkouts } from "./screens/ImportWorkouts";
 import { ActiveWorkout } from "./screens/ActiveWorkout";
 import { syncCatalogNames } from "./lib/syncNames";
+import type { Exercise } from "./db/types";
 import { fmtNum, plural } from "./lib/format";
 
 const TABS = [
@@ -27,6 +28,7 @@ export function App({ db = defaultDb }: { db?: TreinoDB }) {
   const [tab, setTab] = useState<"treinos" | "biblioteca" | "historico" | "ajustes">("treinos");
   const [dataVersion, setDataVersion] = useState(0);
   const [editing, setEditing] = useState<string>();
+  const [newWith, setNewWith] = useState<Exercise>();
   const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState<string>();
 
@@ -51,7 +53,7 @@ export function App({ db = defaultDb }: { db?: TreinoDB }) {
     return <ImportWorkouts db={db} onClose={(msg) => { setNotice(msg); setDataVersion((n) => n + 1); setImporting(false); if (msg) setTab("treinos"); }} />;
   }
   if (editing) {
-    return <EditWorkout key={editing} db={db} workoutId={editing} onClose={(msg) => { setNotice(msg); setEditing(undefined); }} />;
+    return <EditWorkout key={editing} db={db} workoutId={editing} initialExercise={newWith} onClose={(msg) => { setNotice(msg); setEditing(undefined); setNewWith(undefined); if (msg) setTab("treinos"); }} />;
   }
   if (active) {
     return (
@@ -70,7 +72,7 @@ export function App({ db = defaultDb }: { db?: TreinoDB }) {
   return (
     <>
       {tab === "treinos" && <Home key={dataVersion} db={db} notice={notice} onStart={(id, sid) => { setNotice(undefined); setResumeId(sid); setActive(id); }} onEdit={(id) => { setNotice(undefined); setEditing(id); }} onNew={() => { setNotice(undefined); setEditing(NEW_WORKOUT); }} />}
-      {tab === "biblioteca" && <Library key={dataVersion} db={db} />}
+      {tab === "biblioteca" && <Library key={dataVersion} db={db} onAdded={(m) => { setNotice(m); setDataVersion((n) => n + 1); setTab("treinos"); }} onCreateWorkout={(ex) => { setNotice(undefined); setNewWith(ex); setEditing(NEW_WORKOUT); }} />}
       {tab === "historico" && <History key={dataVersion} db={db} onGoTreinos={() => setTab("treinos")} />}
       {tab === "ajustes" && <Settings db={db} onImportWorkouts={() => { setNotice(undefined); setImporting(true); }} onImported={(m) => { setDataVersion((n) => n + 1); setNotice(m); setTab("treinos"); }} />}
       <nav className="tabs" aria-label="Navegação">

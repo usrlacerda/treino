@@ -1,6 +1,7 @@
 import { BrandBar, BrandHeader } from "../components/Logo";
 import { BodyFigure } from "../components/BodyFigure";
 import { Icon } from "../components/Icon";
+import { AddToWorkout } from "../components/AddToWorkout";
 import { MediaLightbox } from "../components/MediaLightbox";
 import { useEffect, useMemo, useState } from "react";
 import type { TreinoDB } from "../db/db";
@@ -18,10 +19,14 @@ interface Props {
   onClose?: () => void;
   /** ids de exercícios que já estão no treino (não aparecem para escolher). */
   hide?: Set<string>;
+  /** Fora do modo de escolha: depois de adicionar a um treino (a tela vai para Treinos com este aviso). */
+  onAdded?: (message: string) => void;
+  /** Fora do modo de escolha: criar um treino novo começando por este exercício. */
+  onCreateWorkout?: (ex: Exercise) => void;
 }
 
 /** Biblioteca única: todos os exercícios (catálogo de ~1.300 + próprios), organizados por grupo muscular. Dados: hasaneyldrm/exercises-dataset; mídia © Gym visual. */
-export function Library({ db, onPick, onClose, hide }: Props) {
+export function Library({ db, onPick, onClose, hide, onAdded, onCreateWorkout }: Props) {
   const [catalog, setCatalog] = useState<CatalogItem[]>();
   const [saved, setSaved] = useState<Exercise[]>([]);
   const [failed, setFailed] = useState(false);
@@ -29,7 +34,8 @@ export function Library({ db, onPick, onClose, hide }: Props) {
   const [group, setGroup] = useState<GroupId>();
   const [equip, setEquip] = useState<EquipKey | "">("");
   const [limit, setLimit] = useState(PAGE);
-  const [zoom, setZoom] = useState<{ id: string; name: string }>();
+  const [zoom, setZoom] = useState<{ id: string; name: string; ex: Exercise }>();
+  const [adding, setAdding] = useState<Exercise>();
 
   useEffect(() => {
     let alive = true;
@@ -113,12 +119,12 @@ export function Library({ db, onPick, onClose, hide }: Props) {
             {shown.slice(0, limit).map((i) => (
               <li key={i.id} className="lib-item">
                 {hasAnim(i.id)
-                  ? <button className="thumb" aria-label={`Ampliar demonstração de ${i.name}`} onClick={() => setZoom({ id: i.id, name: i.name })}><img src={mediaSrc(i.id)} alt="" width="56" height="56" loading="lazy" /></button>
+                  ? <button className="thumb" aria-label={`Ampliar demonstração de ${i.name}`} onClick={() => setZoom({ id: i.id, name: i.name, ex: i.ex })}><img src={mediaSrc(i.id)} alt="" width="56" height="56" loading="lazy" /></button>
                   : <span className="lib-ph" aria-hidden="true" />}
-                <div className="lib-text">
+                <button className="lib-text lib-open" onClick={() => setZoom({ id: i.id, name: i.name, ex: i.ex })}>
                   <strong>{i.name}</strong>
                   <span className="muted">{i.equipLabel}{i.target ? ` · ${i.target}` : ""}{i.custom && <span className="badge inline">Próprio</span>}</span>
-                </div>
+                </button>
                 {onPick && <button className="btn tonal small" aria-label={`Adicionar ${i.name}`} onClick={() => onPick(i.ex)}><Icon name="add" size={18} />Adicionar</button>}
               </li>
             ))}
@@ -126,7 +132,12 @@ export function Library({ db, onPick, onClose, hide }: Props) {
           {shown.length > limit && <button className="btn ghost wide" onClick={() => setLimit((n) => n + PAGE)}>Mostrar mais ({(shown.length - limit).toLocaleString("pt-BR")})</button>}
         </>
       )}
-      {zoom && <MediaLightbox id={zoom.id} name={zoom.name} onClose={() => setZoom(undefined)} />}
+      {zoom && (
+        <MediaLightbox id={zoom.id} name={zoom.name} onClose={() => setZoom(undefined)}>
+          {!onPick && onAdded && onCreateWorkout && <button className="btn" onClick={() => { setAdding(zoom.ex); setZoom(undefined); }}><Icon name="add" size={20} />Adicionar a um treino</button>}
+        </MediaLightbox>
+      )}
+      {adding && onAdded && onCreateWorkout && <AddToWorkout db={db} ex={adding} onClose={() => setAdding(undefined)} onAdded={(m) => { setAdding(undefined); onAdded(m); }} onCreate={(ex) => { setAdding(undefined); onCreateWorkout(ex); }} />}
       <p className="muted credits">Dados: hasaneyldrm/exercises-dataset. Imagens © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a> (abre em nova aba).</p>
     </main>
   );

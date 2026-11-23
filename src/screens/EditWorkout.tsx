@@ -2,19 +2,21 @@ import { BrandBar } from "../components/Logo";
 import { Icon } from "../components/Icon";
 import { useEffect, useState } from "react";
 import type { TreinoDB } from "../db/db";
-import { saveWorkout } from "../db/plan";
-import type { Exercise, Workout } from "../db/types";
+import { defaultItem, saveWorkout } from "../db/plan";
+import type { Exercise, PlanItem, Workout } from "../db/types";
 import { Library } from "./Library";
 
 interface Row { exerciseId: string; sets: string; repMin: string; repMax: string; restSec: string; durationMin?: string }
 /** id especial: abre o editor com um treino vazio, que só é gravado ao salvar. */
 export const NEW_WORKOUT = "novo";
 
-interface Props { db: TreinoDB; workoutId: string; onClose: (saved?: string) => void }
+interface Props { db: TreinoDB; workoutId: string; onClose: (saved?: string) => void; /** treino novo já começa com este exercício */ initialExercise?: Exercise }
 
 const num = (s: string) => (s.trim() === "" ? NaN : Number(s));
 
-export function EditWorkout({ db, workoutId, onClose }: Props) {
+const toRow = (i: PlanItem): Row => ({ exerciseId: i.exerciseId, sets: String(i.sets), repMin: String(i.repMin), repMax: String(i.repMax), restSec: String(i.restSec), durationMin: i.durationMin !== undefined ? String(i.durationMin) : undefined });
+
+export function EditWorkout({ db, workoutId, onClose, initialExercise }: Props) {
   const [base, setBase] = useState<Workout>();
   const [name, setName] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
@@ -24,11 +26,12 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
 
   useEffect(() => {
     (async () => {
+      if (workoutId === NEW_WORKOUT && initialExercise && !(await db.exercises.get(initialExercise.id))) await db.exercises.put(initialExercise);
       const [found, ex] = await Promise.all([workoutId === NEW_WORKOUT ? undefined : db.workouts.get(workoutId), db.exercises.toArray()]);
-      const w = found ?? (workoutId === NEW_WORKOUT ? { id: `w-${Date.now().toString(36)}`, name: "", order: ((await db.workouts.toArray()).reduce((m, x) => Math.max(m, x.order), 0)) + 1, items: [] } : undefined);
+      const w = found ?? (workoutId === NEW_WORKOUT ? { id: `w-${Date.now().toString(36)}`, name: "", order: ((await db.workouts.toArray()).reduce((m, x) => Math.max(m, x.order), 0)) + 1, items: initialExercise ? [defaultItem(initialExercise)] : [] } : undefined);
       if (!w) return;
       setBase(w); setName(w.name); setLib(ex.sort((a, b) => a.name.localeCompare(b.name, "pt-BR")));
-      setRows(w.items.map((i) => ({ exerciseId: i.exerciseId, sets: String(i.sets), repMin: String(i.repMin), repMax: String(i.repMax), restSec: String(i.restSec), durationMin: i.durationMin !== undefined ? String(i.durationMin) : undefined })));
+      setRows(w.items.map(toRow));
     })();
   }, [db, workoutId]);
 
@@ -40,9 +43,7 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
   const remove = (i: number) => setRows((rs) => rs.filter((_, n) => n !== i));
   const add = async (ex: Exercise) => {
     if (!byId[ex.id]) { await db.exercises.put(ex); setLib((l) => [...l, ex].sort((a, b) => a.name.localeCompare(b.name, "pt-BR"))); }
-    setRows((rs) => [...rs, ex.muscle === "cardio"
-      ? { exerciseId: ex.id, sets: "1", repMin: "0", repMax: "0", restSec: "0", durationMin: "15" }
-      : { exerciseId: ex.id, sets: "3", repMin: "8", repMax: "12", restSec: "60" }]);
+    setRows((rs) => [...rs, toRow(defaultItem(ex))]);
     setPicking(false); setError(undefined);
   };
   const inWorkout = new Set(rows.map((r) => r.exerciseId)); // já no treino: não aparece de novo na escolha

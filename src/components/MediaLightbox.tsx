@@ -4,7 +4,7 @@ import { Icon } from "./Icon";
 import { animSrc, hasAnim, mediaSrc, prefersReducedMotion } from "../lib/media";
 
 /** Janela com a demonstração do exercício em tamanho grande. Fecha com o botão, tocando fora ou com Esc. */
-export function MediaLightbox({ id, name, onClose }: { id: string; name: string; onClose: () => void }) {
+export function MediaLightbox({ id, name, onClose, children }: { id: string; name: string; onClose: () => void; /** botões de ação (ex.: adicionar a um treino) acima do "Fechar" */ children?: React.ReactNode }) {
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", h);
@@ -27,6 +27,7 @@ export function MediaLightbox({ id, name, onClose }: { id: string; name: string;
             {info.s.length > 0 && <p className="also"><strong>Também trabalha:</strong> {info.s.join(", ")}.</p>}
           </section>
         )}
+        {children}
         <button className="btn tonal" autoFocus onClick={onClose}><Icon name="close" size={20} />Fechar</button>
       </div>
     </div>

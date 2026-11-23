@@ -338,3 +338,10 @@ button, input, select, textarea { font-family: inherit; }
 .sets .set.done .set-n { color: var(--text); }
 .btn.icon.update { flex: none; background: var(--accent); color: var(--on-accent); border-radius: 50%; width: 44px; height: 44px; min-width: 44px; min-height: 44px; }
 .banner span { min-width: 0; }
+
+.lib-open { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; min-height: 48px; }
+.lib-open::after { content: none; }
+.addto-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 40vh; overflow-y: auto; }
+.addto-item { justify-content: flex-start; text-align: left; }
+.dialog.addto { align-items: stretch; max-width: 460px; }
+.dialog.addto h2, .dialog.addto p { margin: 0; }
