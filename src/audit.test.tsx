@@ -14,7 +14,7 @@ const REPS = "Repetições (reps), série 1, Agachamento no Smith";
 const CONCLUIR = { name: "Série 1 concluída, Agachamento no Smith" };
 
 async function startA(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(await screen.findByText("Treino A"));
+  await user.click(await screen.findByRole("button", { name: /^Treino A/ }));
   await screen.findByLabelText(CARGA);
 }
 async function logFirst(user: ReturnType<typeof userEvent.setup>, w: string, r: string) {
