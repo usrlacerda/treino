@@ -80,4 +80,4 @@
 - Detalhes dos exercícios: passo a passo em português (1.324, traduzido em lotes) + músculos que ajudam, em catalog/info/<n>.json (tools/build-details.py); aparecem ao ampliar a demonstração.
 - Botão de atualizar do aviso: só o ícone (não estoura mais o aviso).
 - Biblioteca: tocar no exercício abre detalhes com "Adicionar a um treino" (escolhe treino existente ou cria treino novo já com o exercício; volta para Treinos com aviso).
-- App renomeado para "CG Fit" (título, manifest, cabeçalho, ajustes). Ícone: aguardando escolha entre 6 variações.
+- App renomeado para "CG Fit" (título, manifest, cabeçalho, ajustes). Ícone: monograma "CG" branco sobre degradê roxo → magenta → laranja (icon.svg, PNGs 32/180/192/512 e maskable com margem de segurança).
