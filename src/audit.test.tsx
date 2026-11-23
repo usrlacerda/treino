@@ -21,6 +21,7 @@ async function logFirst(user: ReturnType<typeof userEvent.setup>, w: string, r: 
   await user.type(screen.getByLabelText(CARGA), w);
   await user.type(screen.getByLabelText(REPS), r);
   await user.click(screen.getByRole("button", CONCLUIR));
+  await waitFor(() => expect(screen.getByRole("button", CONCLUIR)).toHaveAttribute("aria-pressed", "true"));
 }
 
 afterEach(() => vi.useRealTimers());
