@@ -72,7 +72,7 @@ export function Settings({ db, onImported }: Props) {
       </section>
       <section className="exercise" aria-labelledby="sb-h">
         <h2 id="sb-h">Sobre</h2>
-        <p className="muted">Treino {pkg.version}. O app funciona sem internet e não envia seus dados a nenhum servidor. Só o catálogo de exercícios precisa de conexão na primeira vez que você o abre.</p>
+        <p className="muted">CG - Corre Gordo {pkg.version}. O app funciona sem internet e não envia seus dados a nenhum servidor. Só o catálogo de exercícios precisa de conexão na primeira vez que você o abre.</p>
         <p className="muted">Estas orientações são gerais. Se tiver dor ou alguma condição de saúde, consulte um profissional antes de treinar.</p>
         <p className="muted">Imagens dos exercícios: © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a> (abre em nova aba). Dados: hasaneyldrm/exercises-dataset.</p>
       </section>

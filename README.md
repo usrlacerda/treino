@@ -1,4 +1,4 @@
-# Treino
+# CG - Corre Gordo (app de treino PWA)
 
 App de treino (PWA) para registrar cargas e repetições. Funciona offline; os dados ficam só no aparelho (IndexedDB). Sem conta, sem servidor.
 

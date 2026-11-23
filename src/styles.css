@@ -1,10 +1,10 @@
 :root { color-scheme: dark light;
   --bg:#14121a; --surface:#1d1b24; --surface-high:#2a2733; --line:#38353f; --outline:#948f9f; --text:#e8e3ee; --muted:#b4afbf;
-  --accent:#a78bfa; --on-accent:#17102b; --ok:#4ade80; --on-ok:#06210f; --err:#fca5a5; --err-line:#f87171;
+  --accent:#ff6f00; --on-accent:#14121a; --magenta:#d81b60; --on-magenta:#ffffff; --ok:#4ade80; --on-ok:#06210f; --err:#fca5a5; --err-line:#f87171;
   --notice-bg:#16301f; --notice-line:#1f5a34; --notice-text:#bbf7d0; --banner-bg:#2a2540; --ok-text:#bbf7d0; --rail:96px; --err-fill:#f2b8b5; --on-err-fill:#410e0b; }
 @media (prefers-color-scheme: light) { :root {
   --bg:#fdf8ff; --surface:#f3eef8; --surface-high:#e9e2f1; --line:#d4cddc; --outline:#7a7585; --text:#1c1b20; --muted:#5b5766;
-  --accent:#6a43c8; --on-accent:#ffffff; --ok:#1e7a3c; --on-ok:#ffffff; --err:#a3201d; --err-line:#b3261e;
+  --accent:#4f148a; --on-accent:#ffffff; --magenta:#d81b60; --on-magenta:#ffffff; --ok:#1e7a3c; --on-ok:#ffffff; --err:#a3201d; --err-line:#b3261e;
   --notice-bg:#e3f5e8; --notice-line:#9bd1ab; --notice-text:#12391f; --banner-bg:#e9e0fb; --ok-text:#12391f; --err-fill:#b3261e; --on-err-fill:#ffffff; } }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -16,7 +16,7 @@ h2 { font-size: 1.1rem; margin: 0 0 4px; }
 .card { display: flex; flex-direction: column; gap: 4px; width: 100%; text-align: left; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin: 10px 0; font: inherit; min-height: 64px; position: relative; }
 .card.suggested { border-color: var(--accent); }
 .card-title { font-size: 1.2rem; font-weight: 600; }
-.badge { position: absolute; right: 14px; top: 14px; background: var(--accent); color: var(--on-accent); border-radius: 999px; padding: 2px 10px; font-size: .75rem; font-weight: 600; }
+.badge { position: absolute; right: 14px; top: 14px; background: var(--magenta); color: var(--on-magenta); border-radius: 999px; padding: 2px 10px; font-size: .75rem; font-weight: 600; }
 .bar { display: flex; align-items: center; gap: 12px; }
 .link { background: none; border: 0; color: var(--accent); font: inherit; min-height: 48px; padding: 0 8px; }
 .exercise { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin: 12px 0; }
@@ -239,3 +239,13 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 .empty .btn { margin-top: 8px; }
 .empty-icon { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--surface-high); color: var(--accent); }
 .empty-inline { margin: 24px 0; text-align: center; }
+
+/* ===== Identidade CG - Corre Gordo: roxo, magenta e laranja ===== */
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand h1 { margin: 0; }
+.logo { flex: none; display: block; }
+/* degradê só em detalhes de marca; texto sempre sobre cor sólida de contraste conhecido */
+.rest-bar div { background: linear-gradient(90deg, #7a35c0, #e63a78, #ff6f00); }
+@media (prefers-color-scheme: light) { .primary { background: linear-gradient(90deg, #4f148a, #d81b60); color: #ffffff; } }
+.badge.inline { background: var(--surface-high); color: var(--text); }
+.brand { margin-bottom: 6px; }

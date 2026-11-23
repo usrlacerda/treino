@@ -1,3 +1,4 @@
+import { Logo } from "../components/Logo";
 import { Icon } from "../components/Icon";
 import { plural } from "../lib/format";
 import { finishSession, findResumable } from "../db/repo";
@@ -23,7 +24,7 @@ export function Home({ db, onStart, onEdit, onImport, notice }: Props) {
 
   return (
     <main className="app">
-      <h1>Treinos</h1>
+      <div className="brand"><Logo size={40} /><h1>Treinos</h1></div>
       {update.available && (
         <div className="banner" role="status">
           <span>Nova versão disponível. Atualize para usar as novidades.</span>
@@ -53,7 +54,7 @@ export function Home({ db, onStart, onEdit, onImport, notice }: Props) {
       ))}
       <button className="btn ghost wide" onClick={onImport}><Icon name="download" size={20} />Importar treinos de um arquivo</button>
       <footer className="credits muted">
-        Imagens dos exercícios: © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a>
+        CG - Corre Gordo · Imagens dos exercícios: © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a>
       </footer>
     </main>
   );

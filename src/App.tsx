@@ -39,7 +39,7 @@ export function App({ db = defaultDb }: { db?: TreinoDB }) {
   if (failed) {
     return (
       <main className="app" role="alert">
-        <h1>Treino</h1>
+        <h1>CG - Corre Gordo</h1>
         <p>Não conseguimos abrir seus dados neste navegador. Feche outras abas do Treino e tente de novo.</p>
         <button className="btn" onClick={() => setAttempt((n) => n + 1)}>Tentar de novo</button>
       </main>
