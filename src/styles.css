@@ -347,6 +347,13 @@ button, input, select, textarea { font-family: inherit; }
 .dialog.addto h2, .dialog.addto p { margin: 0; }
 
 /* Tudo aparece junto: enquanto o passo a passo carrega, só o aviso fica visível (a imagem já baixa por trás). */
-.dialog.lightbox.loading > :not(.lb-wait) { visibility: hidden; height: 0; margin: 0; overflow: hidden; }
+.dialog.lightbox.loading > :not(.lb-wait):not(.lb-top) { visibility: hidden; height: 0; margin: 0; overflow: hidden; }
 .dialog.lightbox.loading { min-height: 96px; }
 .lb-wait { margin: 0; text-align: center; color: var(--muted, inherit); }
+
+/* Janela do exercício: X fixo no canto superior direito; ação principal flutuando no rodapé do card */
+.lb-top { position: sticky; top: -12px; height: 0; z-index: 3; display: flex; justify-content: flex-end; }
+.lb-close { width: 44px; height: 44px; margin: -12px -12px 0 0; border: 0; border-radius: 999px; display: grid; place-items: center; background: var(--surface-high); color: var(--text); cursor: pointer; box-shadow: 0 1px 4px #0006; }
+.dialog.lightbox h2 { padding-right: 36px; }
+.lb-actions { position: sticky; bottom: -24px; z-index: 2; display: flex; flex-direction: column; gap: 8px; margin: 0 -24px -24px; padding: 28px 24px 24px; background: linear-gradient(to bottom, transparent, var(--surface) 24px); }
+.lb-actions .btn { width: 100%; }

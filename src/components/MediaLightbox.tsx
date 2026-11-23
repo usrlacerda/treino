@@ -4,7 +4,7 @@ import { Icon } from "./Icon";
 import { animSrc, hasAnim, mediaSrc, prefersReducedMotion } from "../lib/media";
 
 /** Janela com a demonstração do exercício em tamanho grande. Fecha com o botão, tocando fora ou com Esc. */
-export function MediaLightbox({ id, name, onClose, children }: { id: string; name: string; onClose: () => void; /** botões de ação (ex.: adicionar a um treino) acima do "Fechar" */ children?: React.ReactNode }) {
+export function MediaLightbox({ id, name, onClose, children }: { id: string; name: string; onClose: () => void; /** botões de ação (ex.: adicionar a um treino) flutuam no rodapé do card */ children?: React.ReactNode }) {
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", h);
@@ -17,6 +17,7 @@ export function MediaLightbox({ id, name, onClose, children }: { id: string; nam
   return (
     <div className="overlay" onClick={onClose}>
       <div className={"dialog lightbox" + (ready ? "" : " loading")} role="dialog" aria-busy={!ready} aria-modal="true" aria-labelledby="lb-t" onClick={(e) => e.stopPropagation()}>
+        <div className="lb-top"><button className="lb-close" aria-label="Fechar" title="Fechar" autoFocus onClick={onClose}><Icon name="close" size={22} /></button></div>
         {!ready && <p className="lb-wait" role="status">Carregando…</p>}
         <h2 id="lb-t">{name}</h2>
         <div className="lightbox-img">
@@ -29,8 +30,7 @@ export function MediaLightbox({ id, name, onClose, children }: { id: string; nam
             {info.s.length > 0 && <p className="also"><strong>Também trabalha:</strong> {info.s.join(", ")}.</p>}
           </section>
         )}
-        {children}
-        <button className="btn tonal" autoFocus onClick={onClose}><Icon name="close" size={20} />Fechar</button>
+        {children && <div className="lb-actions">{children}</div>}
       </div>
     </div>
   );

@@ -86,3 +86,4 @@
 - Bonecos agora usam o desenho anatômico de react-native-body-parts-anatomy (MIT; tools/build-body.mjs gera src/lib/bodyData.ts; créditos em THIRD_PARTY_NOTICES.md). Cardio acende o corpo todo.
 - Imagens dos exercícios refeitas: o catálogo original só tem 180 px; antes eu comprimia forte (q40/q55) e reduzia. Agora ampliadas com Lanczos + nitidez (animação 360 px q70 ≈ 97 MB; miniatura 300 px q80 ≈ 11 MB), baixadas só ao abrir o exercício. Índice (nomes) preservado.
 - Rolagem desnecessária na tela de Treinos: espaço inferior padrão agora é só o da barra de abas (88 px); 170 px apenas em telas com botão fixo/descanso (:has).
+- Janela do exercício: X no canto superior direito (fixo ao rolar) no lugar do botão Fechar; "Adicionar a um treino" flutua no rodapé do card.
