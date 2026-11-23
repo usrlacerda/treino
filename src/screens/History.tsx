@@ -1,8 +1,9 @@
 import { BrandHeader } from "../components/Logo";
 import { Icon } from "../components/Icon";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TreinoDB } from "../db/db";
-import { listFinishedSessions } from "../db/repo";
+import { discardSession, listFinishedSessions } from "../db/repo";
+import { ConfirmDialog } from "../components/ConfirmDialog";
 import type { Exercise, Session } from "../db/types";
 import { LoadChart } from "../components/LoadChart";
 import { formatDateFull } from "../lib/time";
@@ -16,14 +17,48 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
   const [names, setNames] = useState<Record<string, string>>({});
   const [exId, setExId] = useState("");
 
-  useEffect(() => {
-    (async () => {
-      const [s, ex, w] = await Promise.all([listFinishedSessions(db), db.exercises.toArray(), db.workouts.toArray()]);
-      setSessions(s);
-      setLib(Object.fromEntries(ex.map((e) => [e.id, e])));
-      setNames(Object.fromEntries(w.map((x) => [x.id, x.name])));
-    })();
+  const [asking, setAsking] = useState<Session>();
+  const [removed, setRemoved] = useState<Session>(); // último treino excluído, ainda dá para desfazer
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const load = useCallback(async () => {
+    const [s, ex, w] = await Promise.all([listFinishedSessions(db), db.exercises.toArray(), db.workouts.toArray()]);
+    setSessions(s);
+    setLib(Object.fromEntries(ex.map((e) => [e.id, e])));
+    setNames(Object.fromEntries(w.map((x) => [x.id, x.name])));
   }, [db]);
+  useEffect(() => { void load(); }, [load]);
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  async function remove(s: Session) {
+    setAsking(undefined);
+    await discardSession(db, s.id!);
+    setRemoved(s);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setRemoved(undefined), 8000);
+    await load();
+  }
+  async function undo() {
+    if (!removed) return;
+    await db.sessions.put(removed);
+    setRemoved(undefined);
+    clearTimeout(timer.current);
+    await load();
+  }
+  const extras = (
+    <>
+      {removed && (
+        <div className="snackbar" role="status">
+          <span>Treino excluído.</span>
+          <button className="btn small ghost" onClick={() => void undo()}>Desfazer</button>
+        </div>
+      )}
+      {asking && (
+        <ConfirmDialog title="Excluir este treino?" text={`${names[asking.workoutId] ?? "Treino"} de ${formatDateFull(asking.startedAt)}, com ${plural(asking.sets.length, "série", "séries")}, sai do histórico. Você poderá desfazer logo depois.`}
+          confirmLabel="Excluir treino" cancelLabel="Cancelar" danger onConfirm={() => void remove(asking)} onCancel={() => setAsking(undefined)} />
+      )}
+    </>
+  );
 
   const withData = useMemo(() => {
     const ids = new Set<string>();
@@ -42,6 +77,7 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
         <p className="muted">Conclua um treino para ver seu progresso aqui.</p>
         {onGoTreinos && <button className="btn" onClick={onGoTreinos}><Icon name="play" size={20} />Ir para Treinos</button>}
       </section>
+      {extras}
     </main>
   );
 
@@ -67,11 +103,15 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
       <p className="muted storage-note">Seus treinos ficam só neste aparelho. Limpar os dados do navegador apaga o histórico. Faça backup em Ajustes.</p>
       <h2>Treinos feitos</h2>
       {sessions.map((s) => (
-        <div key={s.id} className="exercise">
-          <strong>{names[s.workoutId] ?? s.workoutId}</strong> <span className="muted">· {formatDateFull(s.startedAt)}</span>
-          <p className="muted">{plural(s.sets.length, "série", "séries")} · volume {fmt(sessionVolume(s))} kg</p>
+        <div key={s.id} className="exercise session-row">
+          <div>
+            <strong>{names[s.workoutId] ?? s.workoutId}</strong> <span className="muted">· {formatDateFull(s.startedAt)}</span>
+            <p className="muted">{plural(s.sets.length, "série", "séries")} · volume {fmt(sessionVolume(s))} kg</p>
+          </div>
+          <button className="btn icon danger" aria-label={`Excluir treino ${names[s.workoutId] ?? s.workoutId} de ${formatDateFull(s.startedAt)}`} title="Excluir treino" onClick={() => setAsking(s)}><Icon name="delete" /></button>
         </div>
       ))}
+      {extras}
     </main>
   );
 }
