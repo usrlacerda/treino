@@ -10,9 +10,9 @@ vi.mock("./lib/alert", () => ({ notifyRestOver: vi.fn(), primeAudio: vi.fn() }))
 
 // Protocolo do Treino Trinca (conferido na página do protocolo em 2026-11-23).
 const PROTOCOLO: Record<string, [string, number, number, number][]> = {
-  A: [["Abdominal crunch sentado na máquina", 3, 12, 50], ["Agachamento no Smith", 3, 12, 50], ["Puxada na polia com amplitude total", 3, 12, 50], ["Supino reto com halteres", 3, 12, 50], ["Rosca direta com barra", 3, 12, 50], ["Tríceps corda no pulley", 3, 12, 50]],
-  B: [["Prancha frontal", 3, 30, 50], ["Leg press 45°", 3, 12, 50], ["Panturrilha no leg press", 3, 15, 50], ["Remada baixa sentada na polia", 3, 12, 50], ["Supino inclinado na máquina", 3, 12, 50], ["Elevação lateral com halteres", 3, 12, 50]],
-  C: [["Abdominal crunch no chão", 3, 12, 50], ["Agachamento goblet com halteres", 3, 12, 50], ["Puxada com barra V na polia", 3, 12, 50], ["Crucifixo sentado na máquina", 3, 12, 50], ["Desenvolvimento na máquina", 3, 12, 50], ["Extensão de tríceps deitada com halteres", 3, 12, 50]],
+  A: [["Abdominal na máquina", 3, 12, 50], ["Agachamento no Smith", 3, 12, 50], ["Puxada frontal aberta", 3, 12, 50], ["Supino reto com halteres", 3, 12, 50], ["Rosca direta com barra", 3, 12, 50], ["Tríceps corda no pulley", 3, 12, 50]],
+  B: [["Prancha", 3, 30, 50], ["Leg press 45°", 3, 12, 50], ["Panturrilha no leg press", 3, 15, 50], ["Remada baixa", 3, 12, 50], ["Supino inclinado na máquina", 3, 12, 50], ["Elevação lateral com halteres", 3, 12, 50]],
+  C: [["Abdominal supra", 3, 12, 50], ["Agachamento goblet", 3, 12, 50], ["Puxada com triângulo", 3, 12, 50], ["Crucifixo na máquina (voador)", 3, 12, 50], ["Desenvolvimento na máquina", 3, 12, 50], ["Tríceps testa com halteres", 3, 12, 50]],
 };
 
 describe("treinos idênticos ao protocolo", () => {
@@ -54,8 +54,8 @@ describe("treinos idênticos ao protocolo", () => {
     await user.click(await screen.findByRole("button", { name: /^Treino B/ }));
     expect(await screen.findByText("30 s")).toBeInTheDocument();
     expect(screen.getAllByText("descanso 50s").length).toBeGreaterThan(0);
-    expect(screen.queryByLabelText("Carga em kg, série 1, Prancha frontal")).toBeNull();
-    await user.click(screen.getByRole("button", { name: "Série 1 concluída, Prancha frontal" }));
+    expect(screen.queryByLabelText("Carga em kg, série 1, Prancha")).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Série 1 concluída, Prancha" }));
     expect(await screen.findByRole("timer")).toHaveTextContent("0:50");
     await user.click(screen.getByRole("button", { name: "Finalizar treino" }));
     await waitFor(async () => expect((await db.sessions.toArray())[0].sets[0]).toMatchObject({ exerciseId: "ds-2135", weightKg: 0, reps: 30 }));

@@ -8,6 +8,7 @@ import { EditWorkout, NEW_WORKOUT } from "./screens/EditWorkout";
 import { Settings } from "./screens/Settings";
 import { ImportWorkouts } from "./screens/ImportWorkouts";
 import { ActiveWorkout } from "./screens/ActiveWorkout";
+import { syncCatalogNames } from "./lib/syncNames";
 import { fmtNum, plural } from "./lib/format";
 
 const TABS = [
@@ -31,7 +32,7 @@ export function App({ db = defaultDb }: { db?: TreinoDB }) {
 
   useEffect(() => {
     setFailed(false);
-    seedIfEmpty(db).then(() => closeStaleSessions(db)).then(() => setReady(true)).catch(() => setFailed(true));
+    seedIfEmpty(db).then(() => closeStaleSessions(db)).then(() => { setReady(true); void syncCatalogNames(db).then((n) => { if (n > 0) setDataVersion((v) => v + 1); }).catch(() => undefined); }).catch(() => setFailed(true));
     // Pede ao navegador para não apagar os dados do app quando faltar espaço.
     void navigator.storage?.persist?.()?.catch?.(() => undefined);
   }, [db, attempt]);

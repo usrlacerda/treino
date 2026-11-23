@@ -9,7 +9,7 @@ import { App } from "./App";
 vi.mock("./lib/alert", () => ({ notifyRestOver: vi.fn(), primeAudio: vi.fn() }));
 const fresh = () => new TreinoDB("plan-ui-" + Math.random());
 const ROWS = [
-  ["0313", "Rosca martelo com halteres", "biceps", "dumbbell", "biceps", "dumbbell hammer curl"],
+  ["0313", "Rosca martelo", "biceps", "dumbbell", "biceps", "dumbbell hammer curl"],
   ["0126", "Rosca de punho com barra", "antebraco", "barbell", "forearms", "barbell wrist curl"],
 ];
 beforeEach(() => {
@@ -32,12 +32,12 @@ describe("editar treino", () => {
     const series = screen.getByLabelText("Séries, Agachamento no Smith");
     await user.clear(series); await user.type(series, "4");
     await user.click(screen.getByRole("button", { name: "Descer Agachamento no Smith" }));
-    await user.click(screen.getByRole("button", { name: "Remover Abdominal crunch sentado na máquina" }));
+    await user.click(screen.getByRole("button", { name: "Remover Abdominal na máquina" }));
     await user.click(screen.getByRole("button", { name: "Adicionar exercício" }));
     await user.click(await screen.findByRole("button", { name: /^Bíceps\s*1 exercício/ }));
-    await user.click(await screen.findByRole("button", { name: "Adicionar Rosca martelo com halteres" }));
+    await user.click(await screen.findByRole("button", { name: "Adicionar Rosca martelo" }));
     expect(await screen.findByRole("heading", { name: "Editar treino" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Rosca martelo com halteres/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Rosca martelo/ })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Salvar alterações" }));
 
     expect(await screen.findByText("Treino A salvo.")).toBeInTheDocument();
@@ -46,13 +46,13 @@ describe("editar treino", () => {
     expect(w.items.find((i) => i.exerciseId === "ds-0770")?.sets).toBe(4);
     expect(w.items.some((i) => i.exerciseId === "ds-1452")).toBe(false);
     expect(w.items.some((i) => i.exerciseId === "ds-0313")).toBe(true);
-    expect(await db.exercises.get("ds-0313")).toMatchObject({ name: "Rosca martelo com halteres", muscle: "biceps" });
+    expect(await db.exercises.get("ds-0313")).toMatchObject({ name: "Rosca martelo", muscle: "biceps" });
     expect(w.items.at(-1)?.exerciseId).toBe("ds-0313");
 
     await user.click(await screen.findByText("Treino A"));
     expect(await screen.findByLabelText("Carga em kg, série 4, Agachamento no Smith")).toBeInTheDocument();
     const h2s = screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
-    expect(h2s[0]).toMatch(/Puxada na polia com amplitude total/);
+    expect(h2s[0]).toMatch(/Puxada frontal aberta/);
     expect(h2s[1]).toMatch(/Agachamento no Smith/);
   });
 
@@ -61,7 +61,7 @@ describe("editar treino", () => {
     const user = userEvent.setup();
     render(<App db={db} />);
     await openEditA(user);
-    const min = screen.getByLabelText("Mínimo de repetições, Abdominal crunch sentado na máquina");
+    const min = screen.getByLabelText("Mínimo de repetições, Abdominal na máquina");
     await user.clear(min); await user.type(min, "20");
     await user.click(screen.getByRole("button", { name: "Salvar alterações" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("o mínimo de repetições não pode ser maior que o máximo");
@@ -84,7 +84,7 @@ describe("editar treino", () => {
     const user = userEvent.setup();
     render(<App db={db} />);
     await openEditA(user);
-    const d = screen.getByLabelText("Duração em minutos, Caminhada na esteira inclinada");
+    const d = screen.getByLabelText("Duração em minutos, Esteira inclinada");
     await user.clear(d); await user.type(d, "20");
     await user.click(screen.getByRole("button", { name: "Salvar alterações" }));
     await screen.findByText("Treino A salvo.");
@@ -100,7 +100,7 @@ describe("escolher exercício ao editar o treino", () => {
     await user.click(screen.getByRole("button", { name: "Adicionar exercício" }));
     await screen.findByRole("heading", { name: "Escolher exercício" });
     await user.type(screen.getByLabelText("Buscar exercício"), "martelo");
-    expect(await screen.findByText("Rosca martelo com halteres")).toBeInTheDocument();
+    expect(await screen.findByText("Rosca martelo")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Cancelar" }));
     expect(await screen.findByRole("heading", { name: "Editar treino" })).toBeInTheDocument();
   });

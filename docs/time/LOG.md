@@ -76,3 +76,4 @@
 - Fonte: não vai no site. Ajustes > Fonte: a pessoa escolhe os arquivos (.ttf/.otf/.woff2), guardados só no aparelho (IndexedDB).
 - Treino em andamento: cartão novo (número, chips, miniatura que amplia, séries em grade, progresso). Botão "Novo treino" na tela de Treinos.
 - Removido importar fonte. Fonte: Gotham se instalada, senão Montserrat (embutida, só latino). Catálogo index.json agora NetworkFirst (nomes em inglês vinham do cache antigo).
+- Nomes no vocabulário de academia (tools/gym-names.py: Terra, Abdominal supra, Tríceps testa/francês, Elevação pélvica, Puxada frontal…); busca inteligente (src/lib/search.ts: sinônimos PT/EN/gíria, erro de digitação); nomes salvos sincronizam com o catálogo (DB v4 + syncNames).

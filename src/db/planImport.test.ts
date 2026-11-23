@@ -58,7 +58,7 @@ describe("importar treinos: leitura", () => {
 describe("importar treinos: aplicar", () => {
   const two = () => parsePlanText(file({ workouts: [
     { name: "Treino D", items: [{ exerciseName: "Leg press 45°", reps: "10-12" }, { exerciseName: "Remada nova", muscle: "costas" }] },
-    { name: "Treino E", items: [{ exerciseName: "Crucifixo sentado na máquina" }] },
+    { name: "Treino E", items: [{ exerciseName: "Crucifixo na máquina (voador)" }] },
   ] }));
 
   it("adiciona sem apagar nada, na ordem, e cria só o exercício novo usado", async () => {

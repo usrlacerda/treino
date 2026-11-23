@@ -33,6 +33,12 @@ export class TreinoDB extends Dexie {
       const ss = tx.table("sessions");
       for (const s of (await ss.toArray()) as Session[]) await ss.put(migrateSession(s));
     });
+    // v4: nomes dos exercícios do protocolo passam a ser os usados nas academias.
+    this.version(4).stores({
+      exercises: "id, muscle",
+      workouts: "id, order",
+      sessions: "++id, workoutId, startedAt",
+    }).upgrade((tx) => tx.table("exercises").bulkPut(exercises));
   }
 }
 

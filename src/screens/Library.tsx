@@ -5,7 +5,8 @@ import { MediaLightbox } from "../components/MediaLightbox";
 import { useEffect, useMemo, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import type { Exercise } from "../db/types";
-import { loadCatalog, norm, type CatalogItem } from "../lib/catalog";
+import { rank } from "../lib/search";
+import { loadCatalog, type CatalogItem } from "../lib/catalog";
 import { EQUIP_FILTERS, GROUPS, buildItems, featuredFor, type EquipKey, type GroupId, type LibItem } from "../lib/library";
 import { hasAnim, mediaSrc } from "../lib/media";
 
@@ -44,8 +45,8 @@ export function Library({ db, onPick, onClose, hide }: Props) {
 
   const inGroup = useMemo(() => (group ? items.filter((i) => i.group === group) : items), [items, group]);
   const shown = useMemo(() => {
-    const t = norm(q.trim());
-    return inGroup.filter((i) => (!equip || i.equip === equip) && (!t || norm(i.name).includes(t) || (i.en && norm(i.en).includes(t)) || norm(i.equipLabel).includes(t)));
+    const pool = inGroup.filter((i) => !equip || i.equip === equip);
+    return q.trim() ? rank(pool.map((i) => ({ ...i, groupLabel: GROUPS.find((g) => g.id === i.group)?.label })), q) as LibItem[] : pool;
   }, [inGroup, q, equip]);
   const equipCounts = useMemo(() => {
     const m = new Map<EquipKey, number>();
