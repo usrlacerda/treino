@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { MEDIA_FRAMES, mediaSrc } from "../lib/media";
+import { mediaFrames, mediaSrc } from "../lib/media";
 
 /** Ilustração com duas posições (início e fim do movimento) alternando em loop. Sem imagem: não mostra nada. */
 export function ExerciseMedia({ id, name }: { id: string; name: string }) {
   const [failed, setFailed] = useState(false);
-  const frames = MEDIA_FRAMES[id];
+  const frames = mediaFrames(id) || undefined;
   if (!frames || failed) return null;
   return (
     <div className="media">

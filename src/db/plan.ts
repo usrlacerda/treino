@@ -53,9 +53,9 @@ export async function addExercise(db: TreinoDB, input: NewExercise): Promise<Exe
   return ex;
 }
 
-/** Só exercícios próprios, e só se não estiverem em nenhum treino nem no histórico. */
+/** Só exercícios próprios ou do catálogo, e só se não estiverem em nenhum treino nem no histórico. */
 export async function deleteExercise(db: TreinoDB, id: string): Promise<void> {
-  if (!id.startsWith("custom-")) throw new Error("Os exercícios da biblioteca padrão não podem ser apagados.");
+  if (!/^(custom|ds)-/.test(id)) throw new Error("Os exercícios da biblioteca padrão não podem ser apagados.");
   if ((await db.workouts.toArray()).some((w) => w.items.some((i) => i.exerciseId === id)))
     throw new Error("Este exercício está em um treino. Remova-o do treino antes de apagar.");
   if ((await db.sessions.toArray()).some((s) => s.sets.some((x) => x.exerciseId === id)))

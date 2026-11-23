@@ -18,6 +18,7 @@ App de treino (PWA) para registrar cargas e repetições. Funciona offline; os d
 
 ## Créditos
 Ilustrações dos exercícios: RepDB (uso gratuito com atribuição; exibida no app).
+Catálogo opcional de 1.324 exercícios: hasaneyldrm/exercises-dataset (dados MIT; imagens © Gym visual, https://gymvisual.com/). Para regenerar: `python3 tools/build-catalog.py <pasta do dataset>`.
 
 ## Observações
 `npm audit` aponta 4 avisos moderados só em ferramentas de build (vite-plugin-pwa/minimatch), que não vão para o app publicado.

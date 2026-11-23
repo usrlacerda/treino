@@ -6,4 +6,8 @@ export const MEDIA_FRAMES: Record<string, 1 | 2> = {
   "desenv-halteres": 2, "triceps-testa": 2, "abd-deitado": 2, "prancha": 1, "desenv-maquina": 2, "cardio": 1,
 };
 /** Caminho relativo à base do app, para funcionar na raiz ou em subpasta (ex.: GitHub Pages). */
-export const mediaSrc = (id: string, frame: number) => `${import.meta.env.BASE_URL}exercises/${id}/${frame}.webp`;
+/** Exercícios vindos do catálogo têm id "ds-<número>" e uma única miniatura em /public/catalog/img. */
+export const isCatalogId = (id: string) => id.startsWith("ds-");
+export const mediaFrames = (id: string): 0 | 1 | 2 => (isCatalogId(id) ? 1 : (MEDIA_FRAMES[id] ?? 0));
+export const mediaSrc = (id: string, frame: number) =>
+  isCatalogId(id) ? `${import.meta.env.BASE_URL}catalog/img/${id.slice(3)}.webp` : `${import.meta.env.BASE_URL}exercises/${id}/${frame}.webp`;

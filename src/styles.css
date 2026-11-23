@@ -187,3 +187,4 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 .rest-actions { gap: 6px; flex: none; }
 .rest-actions button { padding: 0 10px; min-width: 44px; }
 @media (max-width: 400px) { .rest-actions button:not(:last-child) { padding: 0 8px; } .rest { gap: 8px; padding: 12px; } }
+.lib-item .badge.inline { white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; flex: none; }

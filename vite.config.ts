@@ -27,7 +27,14 @@ export default defineConfig({
           { src: "icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
         ],
       },
-      workbox: { globPatterns: ["**/*.{js,css,html,svg,png,webp}"] },
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,svg,png,webp}"],
+        globIgnores: ["catalog/**"], // catálogo grande: baixa sob demanda e fica em cache para uso offline
+        runtimeCaching: [
+          { urlPattern: ({ url }) => url.pathname.includes("/catalog/img/"), handler: "CacheFirst", options: { cacheName: "catalog-img", expiration: { maxEntries: 1500, maxAgeSeconds: 60 * 60 * 24 * 365 } } },
+          { urlPattern: ({ url }) => url.pathname.endsWith("/catalog/index.json"), handler: "StaleWhileRevalidate", options: { cacheName: "catalog-index" } },
+        ],
+      },
     }),
   ],
   test: { environment: "jsdom", globals: true, setupFiles: ["./src/setupTests.ts"] },

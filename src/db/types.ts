@@ -1,6 +1,6 @@
 export type Muscle =
   | "peito" | "costas" | "ombros" | "biceps" | "triceps"
-  | "quadriceps" | "posterior" | "gluteos" | "panturrilha" | "abdomen" | "cardio";
+  | "quadriceps" | "posterior" | "gluteos" | "panturrilha" | "abdomen" | "antebraco" | "cardio";
 
 export interface Exercise {
   id: string;

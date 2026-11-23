@@ -74,7 +74,7 @@ export function Settings({ db, onImported }: Props) {
         <h2 id="sb-h">Sobre</h2>
         <p className="muted">Treino {pkg.version}. O app funciona sem internet e não envia seus dados para nenhum servidor.</p>
         <p className="muted">Estas orientações são gerais. Se tiver dor ou alguma condição de saúde, consulte um profissional antes de treinar.</p>
-        <p className="muted">Ilustrações: Exercise data by <a href="https://repdb.co" target="_blank" rel="noreferrer nofollow">RepDB</a> (repdb.co, abre em nova aba).</p>
+        <p className="muted">Ilustrações: Exercise data by <a href="https://repdb.co" target="_blank" rel="noreferrer nofollow">RepDB</a> (repdb.co, abre em nova aba). Catálogo: hasaneyldrm/exercises-dataset, imagens © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a>.</p>
       </section>
       {pending && (
         <div className="overlay">

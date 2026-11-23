@@ -19,7 +19,7 @@ export interface Backup {
 
 export async function exportData(db: TreinoDB): Promise<Backup> {
   const [ex, workouts, sessions] = await Promise.all([db.exercises.toArray(), db.workouts.orderBy("order").toArray(), db.sessions.toArray()]);
-  return { app: BACKUP_APP, schema: BACKUP_SCHEMA, exportedAt: new Date().toISOString(), exercises: ex.filter((e) => e.id.startsWith("custom-")), workouts, sessions };
+  return { app: BACKUP_APP, schema: BACKUP_SCHEMA, exportedAt: new Date().toISOString(), exercises: ex.filter((e) => /^(custom|ds)-/.test(e.id)), workouts, sessions };
 }
 
 class BackupError extends Error {}
@@ -52,8 +52,8 @@ export function parseBackup(raw: unknown): Backup {
   const seedIds = new Set(seedExercises.map((e) => e.id));
   const exercises = arr(raw.exercises, "lista de exercícios", 500).map((e): Exercise => {
     if (!isObj(e)) return bad("Arquivo inválido: exercício.");
-    const id = str(e.id, "id do exercício", 8, 64);
-    if (!/^custom-[a-z0-9-]+$/.test(id)) bad("Arquivo inválido: id de exercício próprio.");
+    const id = str(e.id, "id do exercício", 5, 64);
+    if (!/^(custom|ds)-[a-z0-9-]+$/.test(id)) bad("Arquivo inválido: id de exercício próprio.");
     const muscle = e.muscle as never;
     if (!MUSCLES.includes(muscle)) bad("Arquivo inválido: grupo muscular.");
     return { id, name: str(e.name, "nome do exercício", 1, 60), muscle, equipment: str(e.equipment, "equipamento", 0, 40), cue: str(e.cue, "dica", 0, 200) };

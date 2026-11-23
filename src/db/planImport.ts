@@ -54,8 +54,8 @@ export function parsePlanText(raw: string): PlanFile {
     for (const e of data.exercises) {
       if (!isObj(e)) return bad("Arquivo inválido: exercício.");
       if (!MUSCLES.includes(e.muscle as Muscle)) return bad("Arquivo inválido: grupo muscular de um exercício.");
-      const id = e.id === undefined ? undefined : text(e.id, "id do exercício", 8, 64);
-      if (id && !/^custom-[a-z0-9-]+$/.test(id)) return bad("Arquivo inválido: id de exercício próprio.");
+      const id = e.id === undefined ? undefined : text(e.id, "id do exercício", 5, 64);
+      if (id && !/^(custom|ds)-[a-z0-9-]+$/.test(id)) return bad("Arquivo inválido: id de exercício próprio.");
       exercises.push({ id, name: text(e.name, "nome do exercício", 1, 60), muscle: e.muscle as Muscle,
         equipment: e.equipment === undefined ? "Livre" : text(e.equipment, "equipamento", 0, 40) || "Livre",
         cue: e.cue === undefined ? "" : text(e.cue, "dica", 0, 200) });
@@ -192,7 +192,7 @@ export async function exportPlan(db: TreinoDB) {
   const used = new Set(workouts.flatMap((w) => w.items.map((i) => i.exerciseId)));
   return {
     app: "treino", kind: PLAN_KIND, schema: 1, exportedAt: new Date().toISOString(),
-    exercises: ex.filter((e) => e.id.startsWith("custom-") && used.has(e.id)).map(({ id, name, muscle, equipment, cue }) => ({ id, name, muscle, equipment, cue })),
+    exercises: ex.filter((e) => /^(custom|ds)-/.test(e.id) && used.has(e.id)).map(({ id, name, muscle, equipment, cue }) => ({ id, name, muscle, equipment, cue })),
     workouts: workouts.map((w) => ({ name: w.name, items: w.items.map((i) => ({ ...i })) })),
   };
 }
