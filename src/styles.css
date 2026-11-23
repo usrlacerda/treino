@@ -276,3 +276,9 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 .card-row .card { padding: 16px 56px 16px 18px; }
 .card-row .btn.edit { position: absolute; top: 6px; right: 6px; width: 44px; min-width: 44px; height: 44px; min-height: 44px; border-radius: 50%; background: transparent; color: var(--muted); align-self: auto; }
 .card-row .btn.edit:hover, .card-row .btn.edit:focus-visible { color: var(--text); }
+
+/* Ampliação da demonstração */
+.dialog.lightbox { max-width: 460px; align-items: stretch; }
+.lightbox h2 { margin: 0; font-size: 1.1rem; }
+.lightbox-img { width: 100%; aspect-ratio: 1 / 1; background: #fff; border-radius: 16px; overflow: hidden; }
+.lightbox-img img { width: 100%; height: 100%; object-fit: contain; display: block; }

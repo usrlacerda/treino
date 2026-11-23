@@ -85,11 +85,13 @@ describe("animação do exercício", () => {
     render(<ExerciseMedia id="ds-0002" name="barbell bench press" />);
     expect(screen.getByAltText("barbell bench press: demonstração do movimento")).toHaveAttribute("src", expect.stringContaining("anim/0002.webp"));
   });
-  it("toca a animação ao tocar na miniatura do catálogo", async () => {
+  it("amplia a demonstração ao tocar na miniatura do catálogo e fecha", async () => {
     const user = userEvent.setup();
     await openCatalog(user);
-    const btn = await screen.findByRole("button", { name: "Ver animação de dumbbell curl" });
-    await user.click(btn);
-    expect(screen.getByRole("button", { name: "Parar animação de dumbbell curl" })).toHaveAttribute("aria-pressed", "true");
+    await user.click(await screen.findByRole("button", { name: "Ampliar demonstração de dumbbell curl" }));
+    const dlg = screen.getByRole("dialog", { name: "dumbbell curl" });
+    expect(within(dlg).getByRole("img", { name: /dumbbell curl/ })).toBeInTheDocument();
+    await user.click(within(dlg).getByRole("button", { name: "Fechar" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });

@@ -6,6 +6,7 @@ import type { TreinoDB } from "../db/db";
 import { addExercise, deleteExercise } from "../db/plan";
 import type { Exercise, Muscle } from "../db/types";
 import { mediaFrames, mediaSrc } from "../lib/media";
+import { MediaLightbox } from "../components/MediaLightbox";
 import { MUSCLE_LABEL, MUSCLES } from "../lib/muscles";
 
 const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLocaleLowerCase("pt-BR");
@@ -18,6 +19,7 @@ export function Library({ db }: { db: TreinoDB }) {
   const [browsing, setBrowsing] = useState(false);
   const [error, setError] = useState<string>();
   const [toDelete, setToDelete] = useState<Exercise>();
+  const [zoom, setZoom] = useState<{ id: string; name: string }>();
   const [form, setForm] = useState({ name: "", muscle: "" as Muscle | "", equipment: "", cue: "" });
 
   const reload = () => db.exercises.toArray().then((e) => setList(e.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"))));
@@ -86,7 +88,7 @@ export function Library({ db }: { db: TreinoDB }) {
           const own = /^(custom|ds)-/.test(e.id);
           return (
             <li key={e.id} className="lib-item">
-              {mediaFrames(e.id) ? <img src={mediaSrc(e.id, 0)} alt="" width="56" height="56" loading="lazy" /> : <span className="lib-ph" aria-hidden="true" />}
+              {mediaFrames(e.id) ? <button className="thumb" aria-label={`Ampliar demonstração de ${e.name}`} onClick={() => setZoom({ id: e.id, name: e.name })}><img src={mediaSrc(e.id, 0)} alt="" width="56" height="56" loading="lazy" /></button> : <span className="lib-ph" aria-hidden="true" />}
               <div className="lib-text">
                 <strong>{e.name}</strong>
                 <span className="muted">{MUSCLE_LABEL[e.muscle]} · {e.equipment}{own && <span className="badge inline">{e.id.startsWith("ds-") ? "Catálogo" : "Próprio"}</span>}</span>
@@ -96,6 +98,7 @@ export function Library({ db }: { db: TreinoDB }) {
           );
         })}
       </ul>
+      {zoom && <MediaLightbox id={zoom.id} name={zoom.name} onClose={() => setZoom(undefined)} />}
       {toDelete && (
         <div className="overlay">
           <div className="dialog" role="alertdialog" aria-modal="true" aria-labelledby="apg-t">

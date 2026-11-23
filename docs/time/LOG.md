@@ -63,3 +63,4 @@
 - 2026-11-23: "Importar treinos de um arquivo" movido da Home para Ajustes (cartão "Treinos"); após importar, volta para a aba Treinos. 149 testes ok.
 - 2026-11-23: tela Treinos redesenhada (cartão do próximo treino destacado, prévia dos exercícios, botão play, editar só com ícone).
 - 2026-11-23: play removido; lápis de editar pequeno no canto do cartão.
+- 2026-11-23: miniaturas da Biblioteca e do Catálogo ampliam a demonstração em janela (MediaLightbox).

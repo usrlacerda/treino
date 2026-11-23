@@ -4,7 +4,8 @@ import { Icon } from "../components/Icon";
 import type { TreinoDB } from "../db/db";
 import type { Muscle } from "../db/types";
 import { catalogExerciseId, equipmentPt, loadCatalog, norm, targetPt, toExercise, type CatalogItem } from "../lib/catalog";
-import { animSrc, mediaSrc } from "../lib/media";
+import { mediaSrc } from "../lib/media";
+import { MediaLightbox } from "../components/MediaLightbox";
 import { MUSCLE_LABEL, MUSCLES } from "../lib/muscles";
 
 const PAGE = 30;
@@ -18,7 +19,7 @@ export function Catalog({ db, onClose }: { db: TreinoDB; onClose: () => void }) 
   const [muscle, setMuscle] = useState<Muscle | "">("");
   const [limit, setLimit] = useState(PAGE);
   const [msg, setMsg] = useState<string>();
-  const [playing, setPlaying] = useState<string>();
+  const [zoom, setZoom] = useState<{ id: string; name: string }>();
 
   useEffect(() => {
     let alive = true;
@@ -66,8 +67,8 @@ export function Catalog({ db, onClose }: { db: TreinoDB; onClose: () => void }) 
           const id = catalogExerciseId(c.id), added = have.has(id);
           return (
             <li key={c.id} className="lib-item">
-              <button className="thumb" aria-label={playing === id ? `Parar animação de ${c.name}` : `Ver animação de ${c.name}`} aria-pressed={playing === id} onClick={() => setPlaying(playing === id ? undefined : id)}>
-                <img src={playing === id ? animSrc(id) : mediaSrc(id, 0)} alt="" width="56" height="56" loading="lazy" />
+              <button className="thumb" aria-label={`Ampliar demonstração de ${c.name}`} onClick={() => setZoom({ id, name: c.name })}>
+                <img src={mediaSrc(id, 0)} alt="" width="56" height="56" loading="lazy" />
               </button>
               <div className="lib-text">
                 <strong>{c.name}</strong>
@@ -80,6 +81,7 @@ export function Catalog({ db, onClose }: { db: TreinoDB; onClose: () => void }) 
           );
         })}
       </ul>
+      {zoom && <MediaLightbox id={zoom.id} name={zoom.name} onClose={() => setZoom(undefined)} />}
       {shown.length > limit && <button className="btn ghost wide" onClick={() => setLimit((n) => n + PAGE)}>Mostrar mais ({shown.length - limit})</button>}
       <p className="muted credits">Dados: hasaneyldrm/exercises-dataset. Imagens © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a> (abre em nova aba).</p>
     </main>
