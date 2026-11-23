@@ -22,10 +22,12 @@ if (typeof window !== "undefined") {
 function flush() {
   if (!pending.length) return;
   const toks = pending.splice(0);
-  // Só remove se a entrada de cima ainda é nossa; se a tela já navegou, a entrada fica e é pulada depois.
-  if (!toks.includes(dlgOf() ?? -1)) return;
+  // Remove só as entradas acima de todas as janelas ainda abertas (as de baixo ficam e são puladas depois).
+  const liveMax = stack.reduce((m, e) => Math.max(m, e.tok), 0);
+  const k = toks.filter((t) => t > liveMax).length;
+  if (k === 0 || !toks.includes(dlgOf() ?? -1)) return; // a tela já navegou: a entrada fica e é pulada depois
   ignore++;
-  history.go(-(stack.length ? 1 : toks.length));
+  history.go(-k);
 }
 
 /** Registra uma janela aberta. Devolve a função que deve rodar quando a tela a fecha por conta própria. */

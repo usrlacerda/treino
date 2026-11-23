@@ -1,5 +1,5 @@
 import "fake-indexeddb/auto";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TreinoDB, seedIfEmpty } from "./db/db";
@@ -112,6 +112,8 @@ describe("retomar treino em andamento", () => {
     const user = userEvent.setup();
     render(<App db={db} initialTab="treinos" />);
     await user.click(await screen.findByRole("button", { name: "Encerrar e salvar" }));
+    const ask = await screen.findByRole("alertdialog", { name: "Encerrar este treino?" });
+    await user.click(within(ask).getByRole("button", { name: "Encerrar e salvar" }));
     await waitFor(() => expect(screen.queryByText(/Treino em andamento/)).toBeNull());
     expect((await db.sessions.get(id))?.finishedAt).toBeDefined();
   });

@@ -140,4 +140,49 @@ describe("botão voltar", () => {
     await voltar(); // sai do grupo (não é consumido por uma entrada velha da janela)
     expect(await screen.findByRole("button", { name: /^Peito\s*1 exercício/ })).toBeInTheDocument();
   });
+
+  it("no Início, o voltar pergunta se quer sair; 'Continuar no app' mantém tudo e pergunta de novo no próximo voltar", async () => {
+    const db = fresh(); await seedIfEmpty(db);
+    const user = userEvent.setup();
+    render(<App db={db} />);
+    await screen.findByRole("heading", { name: "Treino A" });
+    await voltar();
+    const ask = await screen.findByRole("alertdialog", { name: "Sair do CG Fit?" });
+    await user.click(within(ask).getByRole("button", { name: "Continuar no app" }));
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+    expect(screen.getByRole("heading", { name: "Treino A" })).toBeInTheDocument();
+    await voltar();
+    expect(await screen.findByRole("alertdialog", { name: "Sair do CG Fit?" })).toBeInTheDocument();
+    await voltar(); // voltar com a pergunta aberta equivale a "continuar no app"
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());
+    expect(screen.getByRole("heading", { name: "Treino A" })).toBeInTheDocument();
+  });
+
+  it("de outra aba o voltar leva ao Início sem perguntar nada", async () => {
+    const db = fresh(); await seedIfEmpty(db);
+    const user = userEvent.setup();
+    render(<App db={db} />);
+    await user.click(await tab("Ajustes"));
+    await voltar();
+    expect(await screen.findByRole("heading", { name: "Treino A" })).toBeInTheDocument();
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  });
+
+  it("editando com mudanças, o voltar pergunta antes de descartar", async () => {
+    const db = fresh(); await seedIfEmpty(db);
+    const user = userEvent.setup();
+    render(<App db={db} />);
+    await user.click(await tab("Treinos"));
+    await user.click(await screen.findByRole("button", { name: "Editar Treino A" }));
+    await user.click(await screen.findByRole("button", { name: "Remover Agachamento no Smith" }));
+    await voltar();
+    const ask = await screen.findByRole("alertdialog", { name: "Descartar alterações?" });
+    expect(screen.getByRole("heading", { name: "Editar treino" })).toBeInTheDocument();
+    await user.click(within(ask).getByRole("button", { name: "Descartar" }));
+    expect(await screen.findByRole("button", { name: "Treinos" })).toHaveAttribute("aria-current", "page");
+    expect((await db.workouts.get("A"))!.items.some((i) => i.exerciseId === "ds-0770")).toBe(true);
+    await voltar();
+    expect(await screen.findByRole("heading", { name: "Treino A" })).toBeInTheDocument(); // Início, e nada de pergunta sobrando
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  });
 });

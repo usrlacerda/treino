@@ -75,8 +75,36 @@ describe("editar treino", () => {
     await openEditA(user);
     await user.click(screen.getByRole("button", { name: "Remover Agachamento no Smith" }));
     await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    const ask = await screen.findByRole("alertdialog", { name: "Descartar alterações?" });
+    await user.click(within(ask).getByRole("button", { name: "Descartar" }));
     expect(await screen.findByText("Escolha o treino de hoje")).toBeInTheDocument();
     expect((await db.workouts.get("A"))!.items[0].exerciseId).toBe("ds-1452");
+  });
+
+  it("sem mudanças, Cancelar sai direto; com mudanças, 'Continuar editando' mantém tudo", async () => {
+    const db = fresh();
+    const user = userEvent.setup();
+    render(<App db={db} initialTab="treinos" />);
+    await openEditA(user);
+    await user.click(screen.getByRole("button", { name: "Remover Agachamento no Smith" }));
+    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    await user.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Continuar editando" }));
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Editar treino" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /Agachamento no Smith/ })).not.toBeInTheDocument(); // a remoção continua
+    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    await user.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Descartar" }));
+    expect(await screen.findByText("Escolha o treino de hoje")).toBeInTheDocument();
+  });
+
+  it("sem mudanças, Cancelar sai sem perguntar", async () => {
+    const db = fresh();
+    const user = userEvent.setup();
+    render(<App db={db} initialTab="treinos" />);
+    await openEditA(user);
+    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    expect(await screen.findByText("Escolha o treino de hoje")).toBeInTheDocument();
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
   });
 
   it("cardio edita a duração", async () => {

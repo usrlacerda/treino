@@ -5,6 +5,8 @@ import type { TreinoDB } from "../db/db";
 import { defaultItem, saveWorkout } from "../db/plan";
 import type { Exercise, PlanItem, Workout } from "../db/types";
 import { Library } from "./Library";
+import { ConfirmDialog } from "../components/ConfirmDialog";
+import { useBackClose } from "../lib/useBackClose";
 
 interface Row { exerciseId: string; sets: string; repMin: string; repMax: string; restSec: string; durationMin?: string }
 /** id especial: abre o editor com um treino vazio, que só é gravado ao salvar. */
@@ -23,6 +25,10 @@ export function EditWorkout({ db, workoutId, onClose, initialExercise }: Props) 
   const [lib, setLib] = useState<Exercise[]>([]);
   const [picking, setPicking] = useState(false);
   const [error, setError] = useState<string>();
+  const [askDiscard, setAskDiscard] = useState(false);
+  const dirty = !!base && (name !== base.name || JSON.stringify(rows) !== JSON.stringify(base.items.map(toRow)));
+  // Com alterações não salvas, o voltar do aparelho pergunta antes de descartar.
+  useBackClose(dirty && !askDiscard, () => setAskDiscard(true));
 
   useEffect(() => {
     (async () => {
@@ -63,7 +69,7 @@ export function EditWorkout({ db, workoutId, onClose, initialExercise }: Props) 
     <main className="app">
       <BrandBar compact />
       <header className="bar">
-        <button className="btn text back" onClick={() => onClose()}><Icon name="back" />Cancelar</button>
+        <button className="btn text back" onClick={() => (dirty ? setAskDiscard(true) : onClose())}><Icon name="back" />Cancelar</button>
         <h1>{workoutId === NEW_WORKOUT ? "Novo treino" : "Editar treino"}</h1>
       </header>
       <label className="field">Nome do treino<input value={name} maxLength={40} onChange={(e) => { setName(e.target.value); setError(undefined); }} /></label>
@@ -94,6 +100,10 @@ export function EditWorkout({ db, workoutId, onClose, initialExercise }: Props) 
       <button className="btn tonal wide" onClick={() => setPicking(true)}><Icon name="add" size={20} />Adicionar exercício</button>
       {error && <p className="error block" role="alert">{error}</p>}
       <button className="primary" onClick={() => void save()}><Icon name="save" />Salvar alterações</button>
+      {askDiscard && (
+        <ConfirmDialog title="Descartar alterações?" text="Você mudou este treino e ainda não salvou. Se sair agora, as mudanças serão perdidas."
+          confirmLabel="Descartar" cancelLabel="Continuar editando" danger onConfirm={() => onClose()} onCancel={() => setAskDiscard(false)} />
+      )}
     </main>
   );
 }

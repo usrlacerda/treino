@@ -13,6 +13,7 @@ import { syncCatalogNames } from "./lib/syncNames";
 import type { Exercise } from "./db/types";
 import { fmtNum, plural } from "./lib/format";
 import { unwindDialogs } from "./lib/backstack";
+import { ConfirmDialog } from "./components/ConfirmDialog";
 
 type Tab = "inicio" | "treinos" | "biblioteca" | "historico" | "ajustes";
 const TABS = [
@@ -39,6 +40,8 @@ export function App({ db = defaultDb, initialTab = "inicio" }: { db?: TreinoDB; 
   // Botão voltar do aparelho: Início é a raiz (de lá o app fecha); abas e telas empilham no histórico do navegador.
   // profundidade 0 = Início, 1 = outra aba, 2 = tela aberta por cima (treino, edição, importação).
   const depth = useRef(0);
+  const [askExit, setAskExit] = useState(false);
+  const exiting = useRef(false);
   const afterBack = useRef<Tab | undefined>(undefined);
   const stamp = (d: number, t: Tab) => ({ cg: 1, depth: d, tab: t });
   const go = useCallback((t: Tab) => {
@@ -50,11 +53,17 @@ export function App({ db = defaultDb, initialTab = "inicio" }: { db?: TreinoDB; 
   const openLayer = () => { history.pushState(stamp(depth.current + 1, tab), ""); depth.current += 1; };
   /** Fecha a tela de cima; `to` escolhe a aba onde se aterrissa (ex.: Treinos depois de salvar). */
   const closeLayer = (to?: Tab) => { afterBack.current = to; history.go(-(1 + unwindDialogs())); };
-  useEffect(() => { history.replaceState(stamp(0, initialTab), ""); depth.current = 0; }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // Início tem uma entrada "guarda" acima da raiz: o voltar que a consome pergunta se quer sair, em vez de fechar o app de cara.
+    history.replaceState(stamp(0, initialTab), ""); history.pushState({ ...stamp(0, initialTab), guard: true }, ""); depth.current = 0;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     const onPop = () => {
       const st = history.state as { cg?: number; depth: number; tab: Tab } | null;
       const d = st?.cg ? st.depth : 0;
+      if (st?.cg && d === 0 && !(st as { guard?: boolean }).guard && depth.current === 0 && !exiting.current) { // passou da guarda: tentou sair
+        history.pushState({ ...stamp(0, st.tab), guard: true }, ""); setAskExit(true); return;
+      }
       if (d >= depth.current) return; // janela fechada pelo voltar: quem trata é a própria janela
       depth.current = d;
       setImporting(false); setEditing(undefined); setNewWith(undefined); setActive(undefined); setResumeId(undefined);
@@ -69,6 +78,15 @@ export function App({ db = defaultDb, initialTab = "inicio" }: { db?: TreinoDB; 
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
+  const confirmExit = () => {
+    exiting.current = true; setAskExit(false);
+    history.go(-(1 + unwindDialogs())); // tira a janela e a guarda; o app fica na primeira entrada
+    setTimeout(() => {
+      history.back(); window.close();
+      // Navegadores não deixam o site fechar o app por conta própria: se ainda estiver aqui, o próximo voltar do aparelho fecha.
+      setTimeout(() => setNotice("Toque em voltar mais uma vez para fechar o app."), 400);
+    }, 60);
+  };
   const startWorkout = (id: string, sid?: number) => { setNotice(undefined); setResumeId(sid); setActive(id); openLayer(); };
   const editWorkout = (id: string) => { setNotice(undefined); setEditing(id); openLayer(); };
 
@@ -124,6 +142,7 @@ export function App({ db = defaultDb, initialTab = "inicio" }: { db?: TreinoDB; 
           </button>
         ))}
       </nav>
+      {askExit && <ConfirmDialog title="Sair do CG Fit?" text="Seus treinos continuam salvos neste aparelho." confirmLabel="Sair" cancelLabel="Continuar no app" onConfirm={confirmExit} onCancel={() => setAskExit(false)} />}
     </>
   );
 }
