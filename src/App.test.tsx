@@ -69,6 +69,7 @@ describe("App", () => {
     await user.type(screen.getByLabelText("Repetições (reps), série 1, Agachamento no Smith"), "8");
     await user.click(screen.getByRole("button", { name: "Série 1 concluída, Agachamento no Smith" }));
     await user.click(screen.getByRole("button", { name: "Finalizar treino" }));
+    await screen.findByText("Escolha o treino de hoje");
     await user.click(await screen.findByRole("button", { name: "Histórico" }));
     expect(await screen.findByText("50 kg × 8")).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /Agachamento no Smith: de 50 kg para 50 kg em 1 treino/ })).toBeInTheDocument();
