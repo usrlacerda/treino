@@ -15,7 +15,7 @@ export function MediaLightbox({ id, name, onClose }: { id: string; name: string;
       <div className="dialog lightbox" role="dialog" aria-modal="true" aria-labelledby="lb-t" onClick={(e) => e.stopPropagation()}>
         <h2 id="lb-t">{name}</h2>
         <div className="lightbox-img">
-          <img src={animated ? animSrc(id) : mediaSrc(id, 0)} alt={animated ? `${name}: demonstração do movimento` : name} />
+          <img src={animated ? animSrc(id) : mediaSrc(id)} alt={animated ? `${name}: demonstração do movimento` : name} />
         </div>
         <button className="btn tonal" autoFocus onClick={onClose}><Icon name="close" size={20} />Fechar</button>
       </div>

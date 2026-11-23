@@ -16,6 +16,12 @@ for e in data:
     p = f"{out}/img/{i}.webp"; im.save(p, "WEBP", quality=55, method=6); total += os.path.getsize(p)
     rows.append([i, NAMES.get(i, e["name"]), m, e["equipment"], e["target"], e["name"]])
 import unicodedata
+# REGRA_PERNAS: agachamentos, leg press e afundos são de quadríceps (o dataset marca o alvo como glúteos)
+import re
+for r in rows:
+    if r[2] == "gluteos" and re.match(r"^(Agachamento|Leg press|Afundo|Subida no step|Step-up|Salto|Cadeira extensora|Avanço|Sissy)", r[1]): r[2] = "quadriceps"
+for r in rows:
+    if re.match(r"^(Stiff|Levantamento terra romeno|Cadeira flexora|Flexão de pernas)", r[1]): r[2] = "posterior"
 rows.sort(key=lambda r: unicodedata.normalize("NFD", r[1]).encode("ascii", "ignore").decode().lower())  # ordem alfabética em português
 json.dump(rows, open(f"{out}/index.json", "w"), ensure_ascii=False, separators=(",", ":"))
 print(len(rows), "exercícios;", round(total/1e6, 1), "MB de miniaturas;", round(os.path.getsize(f"{out}/index.json")/1e3), "KB de índice")

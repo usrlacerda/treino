@@ -7,7 +7,7 @@
   --accent:#4f148a; --on-accent:#ffffff; --magenta:#d81b60; --on-magenta:#ffffff; --ok:#1e7a3c; --on-ok:#ffffff; --err:#a3201d; --err-line:#b3261e;
   --notice-bg:#e3f5e8; --notice-line:#9bd1ab; --notice-text:#12391f; --banner-bg:#e9e0fb; --ok-text:#12391f; --err-fill:#b3261e; --on-err-fill:#ffffff; } }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-user, system-ui), system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
 .app { padding: 16px 16px 96px; max-width: 640px; margin: 0 auto; }
 h1 { font-size: 1.6rem; margin: 8px 0; }
 h2 { font-size: 1.1rem; margin: 0 0 4px; }
@@ -304,3 +304,4 @@ select { width: 100%; min-height: 48px; background: var(--bg); color: var(--text
 .figure .body { fill: color-mix(in srgb, var(--text) 26%, var(--surface)); }
 .figure .hl:not(.on) { opacity: 0; }
 .group-card .figure { width: 84px; height: 134px; }
+button, input, select, textarea { font-family: inherit; }

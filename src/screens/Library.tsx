@@ -112,7 +112,7 @@ export function Library({ db, onPick, onClose, hide }: Props) {
             {shown.slice(0, limit).map((i) => (
               <li key={i.id} className="lib-item">
                 {hasAnim(i.id)
-                  ? <button className="thumb" aria-label={`Ampliar demonstração de ${i.name}`} onClick={() => setZoom({ id: i.id, name: i.name })}><img src={mediaSrc(i.id, 0)} alt="" width="56" height="56" loading="lazy" /></button>
+                  ? <button className="thumb" aria-label={`Ampliar demonstração de ${i.name}`} onClick={() => setZoom({ id: i.id, name: i.name })}><img src={mediaSrc(i.id)} alt="" width="56" height="56" loading="lazy" /></button>
                   : <span className="lib-ph" aria-hidden="true" />}
                 <div className="lib-text">
                   <strong>{i.name}</strong>

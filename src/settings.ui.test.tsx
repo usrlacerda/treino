@@ -26,7 +26,7 @@ async function openSettings(user: ReturnType<typeof userEvent.setup>) {
 async function dataset() {
   const db = fresh(); await seedIfEmpty(db);
   const id = await startSession(db, "B");
-  await logSet(db, id, { exerciseId: "leg-press", setIndex: 0, weightKg: 100, reps: 10, doneAt: 1700000000000 });
+  await logSet(db, id, { exerciseId: "ds-1463", setIndex: 0, weightKg: 100, reps: 10, doneAt: 1700000000000 });
   await finishSession(db, id);
   return JSON.stringify(await exportData(db));
 }

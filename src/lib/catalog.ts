@@ -40,5 +40,5 @@ export const resetCatalogCache = () => { cache = undefined; };
 
 export const catalogExerciseId = (id: string) => `ds-${id}`;
 export function toExercise(c: CatalogItem): Exercise {
-  return { id: catalogExerciseId(c.id), name: c.name, muscle: c.muscle, equipment: equipmentPt(c.equipment).slice(0, 40), cue: `Alvo: ${targetPt(c.target)}.` };
+  return { id: catalogExerciseId(c.id), name: c.name, muscle: c.muscle, equipment: equipmentPt(c.equipment).slice(0, 40), cue: `Alvo: ${targetPt(c.target)}.`, ...(/^Prancha/.test(c.name) ? { timed: true } : {}) };
 }

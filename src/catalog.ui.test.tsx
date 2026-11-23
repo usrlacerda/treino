@@ -86,7 +86,7 @@ describe("biblioteca única", () => {
 describe("exercícios do catálogo no banco", () => {
   it("usa miniatura própria, entra no backup e pode ser removido", async () => {
     const db = fresh(); await seedIfEmpty(db);
-    expect(mediaSrc("ds-0002", 0)).toContain("catalog/img/0002.webp");
+    expect(mediaSrc("ds-0002")).toContain("catalog/img/0002.webp");
     await db.exercises.put(toExercise(toItem(ROWS[1] as never)));
     const backup = await exportData(db);
     expect(backup.exercises.map((e) => e.id)).toContain("ds-0002");

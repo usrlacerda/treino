@@ -5,8 +5,6 @@ import type { TreinoDB } from "../db/db";
 import { saveWorkout } from "../db/plan";
 import type { Exercise, Workout } from "../db/types";
 import { Library } from "./Library";
-import { dsIdOfSaved } from "../lib/library";
-import { catalogExerciseId } from "../lib/catalog";
 
 interface Row { exerciseId: string; sets: string; repMin: string; repMax: string; restSec: string; durationMin?: string }
 interface Props { db: TreinoDB; workoutId: string; onClose: (saved?: string) => void }
@@ -43,8 +41,7 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
       : { exerciseId: ex.id, sets: "3", repMin: "8", repMax: "12", restSec: "60" }]);
     setPicking(false); setError(undefined);
   };
-  /** Já no treino: esconde o mesmo exercício na escolha, mesmo que venha do protocolo inicial. */
-  const inWorkout = new Set(rows.flatMap((r) => { const d = dsIdOfSaved(r.exerciseId); return d ? [r.exerciseId, catalogExerciseId(d)] : [r.exerciseId]; }));
+  const inWorkout = new Set(rows.map((r) => r.exerciseId)); // já no treino: não aparece de novo na escolha
 
   if (picking) return <Library db={db} hide={inWorkout} onPick={(ex) => void add(ex)} onClose={() => setPicking(false)} />;
 

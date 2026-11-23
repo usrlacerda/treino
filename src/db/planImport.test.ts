@@ -14,19 +14,19 @@ describe("importar treinos: leitura", () => {
     const plan = parsePlanText(JSON.stringify(planTemplate()));
     const prev = await buildPreview(db, plan);
     expect(prev.workouts).toHaveLength(1);
-    expect(prev.workouts[0].items[0]).toMatchObject({ exerciseId: "leg-press", sets: 3, repMin: 10, repMax: 12, restSec: 90 });
-    expect(prev.workouts[0].items.at(-1)).toMatchObject({ exerciseId: "cardio", durationMin: 15, sets: 1 });
+    expect(prev.workouts[0].items[0]).toMatchObject({ exerciseId: "ds-1463", sets: 3, repMin: 10, repMax: 12, restSec: 90 });
+    expect(prev.workouts[0].items.at(-1)).toMatchObject({ exerciseId: "ds-3666", durationMin: 15, sets: 1 });
     expect(prev.newExercises.map((e) => e.name)).toEqual(["Remada curvada com barra"]);
     expect(prev.newExercises[0].muscle).toBe("costas");
   });
   it("aceita nome sem acento/caixa, 'reps' como texto e valores padrão", async () => {
-    const plan = parsePlanText(file({ workouts: [{ name: "X", items: [{ exerciseName: "ELEVACAO LATERAL COM HALTERES", reps: "12–15" }, { exercise: "leg press", reps: 10 }] }] }));
+    const plan = parsePlanText(file({ workouts: [{ name: "X", items: [{ exerciseName: "ELEVACAO LATERAL COM HALTERES", reps: "12–15" }, { exercise: "leg press 45°", reps: 10 }] }] }));
     const p = await buildPreview(db, plan);
-    expect(p.workouts[0].items[0]).toMatchObject({ exerciseId: "elevacao-lateral", repMin: 12, repMax: 15, sets: 3, restSec: 60 });
-    expect(p.workouts[0].items[1]).toMatchObject({ exerciseId: "leg-press", repMin: 10, repMax: 10 });
+    expect(p.workouts[0].items[0]).toMatchObject({ exerciseId: "ds-0334", repMin: 12, repMax: 15, sets: 3, restSec: 60 });
+    expect(p.workouts[0].items[1]).toMatchObject({ exerciseId: "ds-1463", repMin: 10, repMax: 10 });
   });
   it("aceita um backup completo e usa só os treinos", async () => {
-    const backup = JSON.stringify({ app: "treino", schema: 1, exportedAt: "x", exercises: [], sessions: [{ lixo: 1 }], workouts: [{ name: "Do backup", items: [{ exerciseId: "leg-press", sets: 3, repMin: 8, repMax: 10, restSec: 60 }] }] });
+    const backup = JSON.stringify({ app: "treino", schema: 1, exportedAt: "x", exercises: [], sessions: [{ lixo: 1 }], workouts: [{ name: "Do backup", items: [{ exerciseId: "ds-1463", sets: 3, repMin: 8, repMax: 10, restSec: 60 }] }] });
     const p = await buildPreview(db, parsePlanText(backup));
     expect(p.workouts[0].name).toBe("Do backup");
   });
@@ -37,33 +37,33 @@ describe("importar treinos: leitura", () => {
     ["sem treinos", file({ workouts: [] }), /nenhum treino/],
     ["treino sem itens", file({ workouts: [{ name: "A", items: [] }] }), /1 a 20 exercícios/],
     ["item sem exercício", file({ workouts: [{ name: "A", items: [{ sets: 3 }] }] }), /não diz qual é o exercício/],
-    ["reps ruins", file({ workouts: [{ name: "A", items: [{ exerciseName: "Leg press", reps: "muitas" }] }] }), /repetições/],
-    ["série como texto", file({ workouts: [{ name: "A", items: [{ exerciseName: "Leg press", sets: "3" }] }] }), /séries/],
-    ["nome gigante", file({ workouts: [{ name: "A".repeat(41), items: [{ exerciseName: "Leg press" }] }] }), /nome do treino/],
-    ["muitos treinos", file({ workouts: Array.from({ length: 21 }, (_, i) => ({ name: "T" + i, items: [{ exerciseName: "Leg press" }] })) }), /treinos demais/],
+    ["reps ruins", file({ workouts: [{ name: "A", items: [{ exerciseName: "Leg press 45°", reps: "muitas" }] }] }), /repetições/],
+    ["série como texto", file({ workouts: [{ name: "A", items: [{ exerciseName: "Leg press 45°", sets: "3" }] }] }), /séries/],
+    ["nome gigante", file({ workouts: [{ name: "A".repeat(41), items: [{ exerciseName: "Leg press 45°" }] }] }), /nome do treino/],
+    ["muitos treinos", file({ workouts: Array.from({ length: 21 }, (_, i) => ({ name: "T" + i, items: [{ exerciseName: "Leg press 45°" }] })) }), /treinos demais/],
     ["id de exercício perigoso", file({ exercises: [{ id: "custom-<x>", name: "Y", muscle: "peito" }], workouts: [{ name: "A", items: [{ exerciseName: "Y" }] }] }), /id de exercício próprio/],
   ])("recusa: %s", (_n, content, re) => {
     expect(() => parsePlanText(content as string)).toThrow(re as RegExp);
   });
   it("nome desconhecido sem grupo muscular é erro que lista o nome", async () => {
-    const plan = parsePlanText(file({ workouts: [{ name: "A", items: [{ exerciseName: "Exercício que não existe" }, { exerciseName: "Leg press" }] }] }));
+    const plan = parsePlanText(file({ workouts: [{ name: "A", items: [{ exerciseName: "Exercício que não existe" }, { exerciseName: "Leg press 45°" }] }] }));
     await expect(buildPreview(db, plan)).rejects.toThrow(/Exercício que não existe/);
   });
   it("limites do treino valem na importação (séries 99)", async () => {
-    const plan = parsePlanText(file({ workouts: [{ name: "A", items: [{ exerciseName: "Leg press", sets: 99 }] }] }));
+    const plan = parsePlanText(file({ workouts: [{ name: "A", items: [{ exerciseName: "Leg press 45°", sets: 99 }] }] }));
     await expect(buildPreview(db, plan)).rejects.toThrow(/séries deve ser de 1 a 10/);
   });
 });
 
 describe("importar treinos: aplicar", () => {
   const two = () => parsePlanText(file({ workouts: [
-    { name: "Treino D", items: [{ exerciseName: "Leg press", reps: "10-12" }, { exerciseName: "Remada nova", muscle: "costas" }] },
-    { name: "Treino E", items: [{ exerciseName: "Crucifixo na máquina" }] },
+    { name: "Treino D", items: [{ exerciseName: "Leg press 45°", reps: "10-12" }, { exerciseName: "Remada nova", muscle: "costas" }] },
+    { name: "Treino E", items: [{ exerciseName: "Crucifixo sentado na máquina" }] },
   ] }));
 
   it("adiciona sem apagar nada, na ordem, e cria só o exercício novo usado", async () => {
     const ses = await startSession(db, "A");
-    await logSet(db, ses, { exerciseId: "leg-press", setIndex: 0, weightKg: 100, reps: 10, doneAt: 1 });
+    await logSet(db, ses, { exerciseId: "ds-1463", setIndex: 0, weightKg: 100, reps: 10, doneAt: 1 });
     await finishSession(db, ses);
     const prev = await buildPreview(db, two());
     const n = await applyImport(db, prev, [{ index: 0, name: "Treino D" }, { index: 1, name: "Treino E" }]);
@@ -79,7 +79,7 @@ describe("importar treinos: aplicar", () => {
     expect((await db.exercises.toArray()).some((e) => e.id.startsWith("custom-"))).toBe(false);
   });
   it("renomear permite importar um treino com nome repetido; nome repetido sem renomear é recusado e nada é gravado", async () => {
-    const prev = await buildPreview(db, parsePlanText(file({ workouts: [{ name: "Treino A", items: [{ exerciseName: "Leg press" }] }] })));
+    const prev = await buildPreview(db, parsePlanText(file({ workouts: [{ name: "Treino A", items: [{ exerciseName: "Leg press 45°" }] }] })));
     await expect(applyImport(db, prev, [{ index: 0, name: "treino a" }])).rejects.toThrow(/Já existe um treino chamado/);
     expect(await db.workouts.count()).toBe(3);
     await applyImport(db, prev, [{ index: 0, name: suggestName("Treino A", ["Treino A", "Treino B", "Treino C"]) }]);
@@ -93,7 +93,7 @@ describe("importar treinos: aplicar", () => {
   it("nenhum selecionado e limite total de treinos", async () => {
     const prev = await buildPreview(db, two());
     await expect(applyImport(db, prev, [])).rejects.toThrow(/pelo menos um/);
-    for (let i = 0; i < 47; i++) await db.workouts.add({ id: "w" + i, name: "W" + i, order: 10 + i, items: [{ exerciseId: "leg-press", sets: 3, repMin: 8, repMax: 10, restSec: 60 }] });
+    for (let i = 0; i < 47; i++) await db.workouts.add({ id: "w" + i, name: "W" + i, order: 10 + i, items: [{ exerciseId: "ds-1463", sets: 3, repMin: 8, repMax: 10, restSec: 60 }] });
     await expect(applyImport(db, prev, [{ index: 0, name: "N1" }, { index: 1, name: "N2" }])).rejects.toThrow(/no máximo 50/);
   });
   it("reaproveita exercício próprio que já existe (mesmo nome) em vez de duplicar", async () => {

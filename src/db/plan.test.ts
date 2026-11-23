@@ -8,10 +8,10 @@ import type { Workout } from "./types";
 let db: TreinoDB;
 beforeEach(async () => { db = new TreinoDB("plan-" + Math.random()); await seedIfEmpty(db); });
 
-const base = (): Workout => ({ id: "A", name: "Treino A", order: 1, items: [{ exerciseId: "leg-press", sets: 3, repMin: 8, repMax: 12, restSec: 90 }] });
+const base = (): Workout => ({ id: "A", name: "Treino A", order: 1, items: [{ exerciseId: "ds-1463", sets: 3, repMin: 8, repMax: 12, restSec: 90 }] });
 
 describe("validação do treino", () => {
-  const known = new Set(["leg-press", "cardio"]);
+  const known = new Set(["ds-1463", "ds-3666"]);
   it("aceita um treino válido", () => expect(validateWorkout(base(), known)).toEqual([]));
   it.each([
     ["séries 0", { sets: 0 }, /séries deve ser de 1 a 10/],
@@ -32,7 +32,7 @@ describe("validação do treino", () => {
     expect(validateWorkout(w, known).join()).toMatch(/não encontrado/);
   });
   it("cardio valida a duração", () => {
-    const w = base(); w.items = [{ exerciseId: "cardio", sets: 1, repMin: 0, repMax: 0, restSec: 0, durationMin: 0 }];
+    const w = base(); w.items = [{ exerciseId: "ds-3666", sets: 1, repMin: 0, repMax: 0, restSec: 0, durationMin: 0 }];
     expect(validateWorkout(w, known).join()).toMatch(/duração/);
     w.items[0].durationMin = 20;
     expect(validateWorkout(w, known)).toEqual([]);
@@ -63,7 +63,7 @@ describe("salvar e exercícios próprios", () => {
   });
   it("só apaga exercício próprio que não esteja em treino nem em histórico", async () => {
     const ex = await addExercise(db, { name: "Prancha lateral", muscle: "abdomen", equipment: "", cue: "" });
-    await expect(deleteExercise(db, "leg-press")).rejects.toThrow(/padrão/);
+    await expect(deleteExercise(db, "ds-1463")).rejects.toThrow(/está em um treino/);
     const w = base(); w.items.push({ exerciseId: ex.id, sets: 3, repMin: 10, repMax: 12, restSec: 60 });
     await saveWorkout(db, w);
     await expect(deleteExercise(db, ex.id)).rejects.toThrow(/está em um treino/);

@@ -28,8 +28,8 @@ describe("seed", () => {
 describe("sessões", () => {
   it("registra série, atualiza a mesma série e não duplica", async () => {
     const id = await startSession(db, "A");
-    await logSet(db, id, { exerciseId: "agach-smith", setIndex: 0, weightKg: 40, reps: 8, doneAt: 1 });
-    await logSet(db, id, { exerciseId: "agach-smith", setIndex: 0, weightKg: 42, reps: 9, doneAt: 2 });
+    await logSet(db, id, { exerciseId: "ds-0770", setIndex: 0, weightKg: 40, reps: 8, doneAt: 1 });
+    await logSet(db, id, { exerciseId: "ds-0770", setIndex: 0, weightKg: 42, reps: 9, doneAt: 2 });
     const s = await db.sessions.get(id);
     expect(s?.sets).toHaveLength(1);
     expect(s?.sets[0].weightKg).toBe(42);
@@ -39,10 +39,10 @@ describe("sessões", () => {
   });
   it("mostra a última vez só de sessões concluídas", async () => {
     const id = await startSession(db, "A");
-    await logSet(db, id, { exerciseId: "agach-smith", setIndex: 0, weightKg: 40, reps: 8, doneAt: 1 });
-    expect(await lastSetsFor(db, "agach-smith")).toHaveLength(0);
+    await logSet(db, id, { exerciseId: "ds-0770", setIndex: 0, weightKg: 40, reps: 8, doneAt: 1 });
+    expect(await lastSetsFor(db, "ds-0770")).toHaveLength(0);
     await finishSession(db, id);
-    expect((await lastSetsFor(db, "agach-smith"))[0].weightKg).toBe(40);
+    expect((await lastSetsFor(db, "ds-0770"))[0].weightKg).toBe(40);
   });
   it("sugere o próximo treino em rodízio A→B→C→A", async () => {
     expect(await nextWorkoutId(db)).toBe("A");
@@ -61,7 +61,7 @@ describe("sessões abandonadas", () => {
   it("apaga as vazias e conclui as com séries, sem perder dados", async () => {
     const vazia = await startSession(db, "A");
     const comSeries = await startSession(db, "B");
-    await logSet(db, comSeries, { exerciseId: "leg-press", setIndex: 0, weightKg: 100, reps: 10, doneAt: 5000 });
+    await logSet(db, comSeries, { exerciseId: "ds-1463", setIndex: 0, weightKg: 100, reps: 10, doneAt: 5000 });
     await closeStaleSessions(db);
     expect(await db.sessions.get(vazia)).toBeUndefined();
     const s = await db.sessions.get(comSeries);

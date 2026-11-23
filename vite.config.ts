@@ -2,6 +2,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { readFileSync } from "node:fs";
+
+const seedIds = [...readFileSync("src/db/seed.ts", "utf-8").matchAll(/id: "ds-(\d+)"/g)].map((m) => m[1]);
 
 export default defineConfig({
   base: "./",
@@ -30,6 +33,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,webp}"],
         globIgnores: ["catalog/**"], // catálogo grande: baixa sob demanda e fica em cache para uso offline
+        // os exercícios do protocolo inicial já ficam disponíveis offline desde a instalação
+        additionalManifestEntries: seedIds.flatMap((n) => [`catalog/img/${n}.webp`, `catalog/anim/${n}.webp`].map((url) => ({ url, revision: "1" }))),
         runtimeCaching: [
           { urlPattern: ({ url }) => url.pathname.includes("/catalog/img/") || url.pathname.includes("/catalog/anim/"), handler: "CacheFirst", options: { cacheName: "catalog-img", expiration: { maxEntries: 3000, maxAgeSeconds: 60 * 60 * 24 * 365 } } },
           { urlPattern: ({ url }) => url.pathname.endsWith("/catalog/index.json"), handler: "StaleWhileRevalidate", options: { cacheName: "catalog-index" } },

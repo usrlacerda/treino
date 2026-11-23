@@ -24,7 +24,7 @@ async function open(user: ReturnType<typeof userEvent.setup>) {
   await screen.findByRole("heading", { name: "Importar treinos" });
 }
 const sample = json({ workouts: [
-  { name: "Treino A", items: [{ exerciseName: "Leg press", reps: "10-12" }] },
+  { name: "Treino A", items: [{ exerciseName: "Leg press 45°", reps: "10-12" }] },
   { name: "Treino E", items: [{ exerciseName: "Remada nova", muscle: "costas" }] },
 ] });
 

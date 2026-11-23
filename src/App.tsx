@@ -8,6 +8,7 @@ import { EditWorkout } from "./screens/EditWorkout";
 import { Settings } from "./screens/Settings";
 import { ImportWorkouts } from "./screens/ImportWorkouts";
 import { ActiveWorkout } from "./screens/ActiveWorkout";
+import { applyUserFont } from "./lib/userFont";
 import { fmtNum, plural } from "./lib/format";
 
 const TABS = [
@@ -28,6 +29,8 @@ export function App({ db = defaultDb }: { db?: TreinoDB }) {
   const [editing, setEditing] = useState<string>();
   const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState<string>();
+
+  useEffect(() => { void applyUserFont().catch(() => undefined); }, []);
 
   useEffect(() => {
     setFailed(false);

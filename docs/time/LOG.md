@@ -66,3 +66,11 @@
 - 2026-11-23: miniaturas da Biblioteca e do Catálogo ampliam a demonstração em janela (MediaLightbox).
 - 2026-11-23: nomes do catálogo traduzidos para PT-BR (padrão de academia), ordenados A–Z, nome em inglês guardado para busca (tools/names-pt.json).
 - 2026-11-23: Biblioteca e Catálogo unificados (cards por grupo com figura, lista com filtro de equipamento, busca PT/EN); criar exercício removido; "Adicionar exercício" no editor de treino abre a Biblioteca.
+
+## 2026-11-23 — Só exercícios do catálogo + fonte Samsung Sans
+- Os 24 exercícios do protocolo agora são do catálogo (ids ds-…); treinos A/B/C usam eles. Prancha é por tempo.
+- Banco v3: troca ids antigos em treinos e histórico; backups e planos antigos também são convertidos (src/db/legacy.ts).
+- Removidos public/exercises, MEDIA_FRAMES e o código de mídia antigo; mídia dos 24 fica offline via precache.
+- Agachamentos/leg press → quadríceps; stiff → posterior. Prancha renomeada "Prancha frontal".
+- Fonte Samsung Sans (Regular/Medium/Bold, woff2) em todo o app. 154 testes ok, build ok.
+- Fonte: não vai no site. Ajustes > Fonte: a pessoa escolhe os arquivos (.ttf/.otf/.woff2), guardados só no aparelho (IndexedDB).

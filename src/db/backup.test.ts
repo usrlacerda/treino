@@ -14,7 +14,7 @@ async function withData() {
   w.items.push({ exerciseId: ex.id, sets: 3, repMin: 8, repMax: 10, restSec: 75 });
   await saveWorkout(db, w);
   const s = await startSession(db, "A");
-  await logSet(db, s, { exerciseId: "agach-smith", setIndex: 0, weightKg: 42.5, reps: 8, doneAt: 1700000000000 });
+  await logSet(db, s, { exerciseId: "ds-0770", setIndex: 0, weightKg: 42.5, reps: 8, doneAt: 1700000000000 });
   await finishSession(db, s);
   return ex;
 }
@@ -73,7 +73,7 @@ describe("backup: arquivo inválido é recusado com motivo", () => {
     ["treino com mínimo > máximo", (b: any) => { b.workouts[0].items[0].repMin = 20; }, /mínimo de repetições/],
     ["treinos repetidos", (b: any) => { b.workouts.push(b.workouts[0]); }, /treinos repetidos/],
     ["sem treinos", (b: any) => { b.workouts = []; b.sessions = []; }, /nenhum treino/],
-    ["exercício próprio com id que imita o padrão", (b: any) => { b.exercises[0].id = "leg-press"; }, /id de exercício próprio/],
+    ["exercício próprio com id que imita o padrão", (b: any) => { b.exercises[0].id = "ds-1463"; }, /id de exercício próprio/],
     ["id com caracteres perigosos", (b: any) => { b.exercises[0].id = "custom-<script>"; }, /id de exercício próprio/],
     ["grupo muscular inválido", (b: any) => { b.exercises[0].muscle = "cabelo"; }, /grupo muscular/],
     ["lista não é lista", (b: any) => { b.sessions = {}; }, /lista de sessões/],

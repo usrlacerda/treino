@@ -1,6 +1,7 @@
 import Dexie, { type Table } from "dexie";
 import type { Exercise, Session, Workout } from "./types";
-import { exercises, LEGACY_WORKOUTS_V1, workouts } from "./seed";
+import { exercises, workouts } from "./seed";
+import { LEGACY_IDS, migrateSession, migrateWorkout } from "./legacy";
 
 export class TreinoDB extends Dexie {
   exercises!: Table<Exercise, string>;
@@ -14,19 +15,23 @@ export class TreinoDB extends Dexie {
       workouts: "id, order",
       sessions: "++id, workoutId, startedAt",
     });
-    // v2: treinos A/B/C iguais ao protocolo. Só troca os que ainda estão como na primeira versão (não mexe nos editados).
     this.version(2).stores({
       exercises: "id, muscle",
       workouts: "id, order",
       sessions: "++id, workoutId, startedAt",
+    });
+    // v3: todos os exercícios passam a ser do catálogo. Troca os ids antigos nos treinos e no histórico e põe os exercícios do protocolo na biblioteca.
+    this.version(3).stores({
+      exercises: "id, muscle",
+      workouts: "id, order",
+      sessions: "++id, workoutId, startedAt",
     }).upgrade(async (tx) => {
+      await tx.table("exercises").bulkDelete(Object.keys(LEGACY_IDS));
       await tx.table("exercises").bulkPut(exercises);
-      const table = tx.table("workouts");
-      for (const w of workouts) {
-        const legacy = LEGACY_WORKOUTS_V1.find((l) => l.id === w.id)!;
-        const current = await table.get(w.id);
-        if (current && JSON.stringify(current) === JSON.stringify(legacy)) await table.put(w);
-      }
+      const ws = tx.table("workouts");
+      for (const w of (await ws.toArray()) as Workout[]) await ws.put(migrateWorkout(w));
+      const ss = tx.table("sessions");
+      for (const s of (await ss.toArray()) as Session[]) await ss.put(migrateSession(s));
     });
   }
 }

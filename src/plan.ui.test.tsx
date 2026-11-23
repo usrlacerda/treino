@@ -32,7 +32,7 @@ describe("editar treino", () => {
     const series = screen.getByLabelText("Séries, Agachamento no Smith");
     await user.clear(series); await user.type(series, "4");
     await user.click(screen.getByRole("button", { name: "Descer Agachamento no Smith" }));
-    await user.click(screen.getByRole("button", { name: "Remover Abdominal crunch na máquina" }));
+    await user.click(screen.getByRole("button", { name: "Remover Abdominal crunch sentado na máquina" }));
     await user.click(screen.getByRole("button", { name: "Adicionar exercício" }));
     await user.click(await screen.findByRole("button", { name: /^Bíceps\s*1 exercício/ }));
     await user.click(await screen.findByRole("button", { name: "Adicionar Rosca martelo com halteres" }));
@@ -42,9 +42,9 @@ describe("editar treino", () => {
 
     expect(await screen.findByText("Treino A salvo.")).toBeInTheDocument();
     const w = (await db.workouts.get("A"))!;
-    expect(w.items.map((i) => i.exerciseId).slice(0, 2)).toEqual(["puxada-aberta", "agach-smith"]);
-    expect(w.items.find((i) => i.exerciseId === "agach-smith")?.sets).toBe(4);
-    expect(w.items.some((i) => i.exerciseId === "abd-maquina")).toBe(false);
+    expect(w.items.map((i) => i.exerciseId).slice(0, 2)).toEqual(["ds-2330", "ds-0770"]);
+    expect(w.items.find((i) => i.exerciseId === "ds-0770")?.sets).toBe(4);
+    expect(w.items.some((i) => i.exerciseId === "ds-1452")).toBe(false);
     expect(w.items.some((i) => i.exerciseId === "ds-0313")).toBe(true);
     expect(await db.exercises.get("ds-0313")).toMatchObject({ name: "Rosca martelo com halteres", muscle: "biceps" });
     expect(w.items.at(-1)?.exerciseId).toBe("ds-0313");
@@ -52,7 +52,7 @@ describe("editar treino", () => {
     await user.click(await screen.findByText("Treino A"));
     expect(await screen.findByLabelText("Carga em kg, série 4, Agachamento no Smith")).toBeInTheDocument();
     const h2s = screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
-    expect(h2s[0]).toMatch(/1\. Puxada frontal aberta/);
+    expect(h2s[0]).toMatch(/1\. Puxada na polia com amplitude total/);
     expect(h2s[1]).toMatch(/2\. Agachamento no Smith/);
   });
 
@@ -61,7 +61,7 @@ describe("editar treino", () => {
     const user = userEvent.setup();
     render(<App db={db} />);
     await openEditA(user);
-    const min = screen.getByLabelText("Mínimo de repetições, Abdominal crunch na máquina");
+    const min = screen.getByLabelText("Mínimo de repetições, Abdominal crunch sentado na máquina");
     await user.clear(min); await user.type(min, "20");
     await user.click(screen.getByRole("button", { name: "Salvar alterações" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("o mínimo de repetições não pode ser maior que o máximo");
@@ -76,7 +76,7 @@ describe("editar treino", () => {
     await user.click(screen.getByRole("button", { name: "Remover Agachamento no Smith" }));
     await user.click(screen.getByRole("button", { name: "Cancelar" }));
     expect(await screen.findByText("Escolha o treino de hoje")).toBeInTheDocument();
-    expect((await db.workouts.get("A"))!.items[0].exerciseId).toBe("abd-maquina");
+    expect((await db.workouts.get("A"))!.items[0].exerciseId).toBe("ds-1452");
   });
 
   it("cardio edita a duração", async () => {
@@ -84,7 +84,7 @@ describe("editar treino", () => {
     const user = userEvent.setup();
     render(<App db={db} />);
     await openEditA(user);
-    const d = screen.getByLabelText("Duração em minutos, Cardio (esteira, bike ou elíptico)");
+    const d = screen.getByLabelText("Duração em minutos, Caminhada na esteira inclinada");
     await user.clear(d); await user.type(d, "20");
     await user.click(screen.getByRole("button", { name: "Salvar alterações" }));
     await screen.findByText("Treino A salvo.");

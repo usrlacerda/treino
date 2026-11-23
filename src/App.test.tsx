@@ -28,7 +28,7 @@ describe("App", () => {
 
     await waitFor(async () => {
       const s = await db.sessions.toArray();
-      expect(s[0].sets).toEqual([expect.objectContaining({ exerciseId: "agach-smith", setIndex: 0, weightKg: 40, reps: 8 })]);
+      expect(s[0].sets).toEqual([expect.objectContaining({ exerciseId: "ds-0770", setIndex: 0, weightKg: 40, reps: 8 })]);
     });
 
     await user.click(screen.getByRole("button", { name: "Finalizar treino" }));
@@ -81,7 +81,7 @@ describe("App", () => {
     render(<App db={fresh()} />);
     await user.click(await screen.findByText("Treino A"));
     const demo = await screen.findByAltText("Agachamento no Smith: demonstração do movimento");
-    expect(demo).toHaveAttribute("src", "/exercises/agach-smith/anim.webp");
+    expect(demo).toHaveAttribute("src", "/catalog/anim/0770.webp");
   });
 
   it("não registra série com repetições vazias", async () => {

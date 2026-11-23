@@ -38,16 +38,6 @@ export function equipKey(raw: string): EquipKey {
   return "outros";
 }
 
-/** Exercícios do protocolo inicial e o id equivalente no catálogo (mesma demonstração). Evita mostrar o mesmo movimento duas vezes. */
-export const SEED_TO_DS: Record<string, string> = {
-  "abd-maquina": "1452", "agach-smith": "0770", "puxada-aberta": "2330", "supino-halteres": "0289", "rosca-barra": "0031", "triceps-corda": "0200",
-  cardio: "3666", prancha: "2135", "leg-press": "1463", "panturrilha-leg": "1391", "remada-baixa": "0180", "supino-inclinado-maq": "1299",
-  "elevacao-lateral": "0334", "abd-deitado": "0274", "agach-halter": "1760", "puxada-fechada": "2616", "crucifixo-maq": "0596",
-  "desenv-maquina": "0603", "triceps-testa": "0351", "stiff-halteres": "0432", "mesa-flexora": "0586", "rosca-martelo": "0313", "elev-pelvica": "1409", "desenv-halteres": "0405",
-};
-/** ids (de exercícios salvos) que já cobrem esse item do catálogo. */
-export const dsIdOfSaved = (id: string): string | undefined => (id.startsWith("ds-") ? id.slice(3) : SEED_TO_DS[id]);
-
 export interface LibItem { id: string; name: string; en?: string; group: GroupId; equip: EquipKey; equipLabel: string; target: string; custom: boolean; ex: Exercise }
 
 export function buildItems(catalog: CatalogItem[] | undefined, saved: Exercise[]): LibItem[] {

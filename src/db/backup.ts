@@ -1,5 +1,6 @@
 import type { TreinoDB } from "./db";
 import { exercises as seedExercises } from "./seed";
+import { migrateId } from "./legacy";
 import { validateWorkout } from "./plan";
 import { MUSCLES } from "../lib/muscles";
 import type { Exercise, LoggedSet, Session, Workout } from "./types";
@@ -17,9 +18,10 @@ export interface Backup {
   sessions: Session[];
 }
 
+/** Os exercícios do protocolo inicial já vêm com o app, então não entram no arquivo. */
 export async function exportData(db: TreinoDB): Promise<Backup> {
   const [ex, workouts, sessions] = await Promise.all([db.exercises.toArray(), db.workouts.orderBy("order").toArray(), db.sessions.toArray()]);
-  return { app: BACKUP_APP, schema: BACKUP_SCHEMA, exportedAt: new Date().toISOString(), exercises: ex.filter((e) => /^(custom|ds)-/.test(e.id)), workouts, sessions };
+  return { app: BACKUP_APP, schema: BACKUP_SCHEMA, exportedAt: new Date().toISOString(), exercises: ex.filter((e) => /^(custom|ds)-/.test(e.id) && !seedExercises.some((s) => s.id === e.id)), workouts, sessions };
 }
 
 class BackupError extends Error {}
@@ -53,7 +55,7 @@ export function parseBackup(raw: unknown): Backup {
   const exercises = arr(raw.exercises, "lista de exercícios", 500).map((e): Exercise => {
     if (!isObj(e)) return bad("Arquivo inválido: exercício.");
     const id = str(e.id, "id do exercício", 5, 64);
-    if (!/^(custom|ds)-[a-z0-9-]+$/.test(id)) bad("Arquivo inválido: id de exercício próprio.");
+    if (!/^(custom|ds)-[a-z0-9-]+$/.test(id) || seedIds.has(id)) bad("Arquivo inválido: id de exercício próprio.");
     const muscle = e.muscle as never;
     if (!MUSCLES.includes(muscle)) bad("Arquivo inválido: grupo muscular.");
     return { id, name: str(e.name, "nome do exercício", 1, 60), muscle, equipment: str(e.equipment, "equipamento", 0, 40), cue: str(e.cue, "dica", 0, 200) };
@@ -67,7 +69,7 @@ export function parseBackup(raw: unknown): Backup {
     const items = arr(w.items, "exercícios do treino", 20).map((i) => {
       if (!isObj(i)) return bad("Arquivo inválido: item do treino.");
       const item = {
-        exerciseId: str(i.exerciseId, "exercício do treino", 1, 64), sets: num(i.sets, "séries", 0, 10), repMin: num(i.repMin, "repetições mínimas", 0, 50),
+        exerciseId: migrateId(str(i.exerciseId, "exercício do treino", 1, 64)), sets: num(i.sets, "séries", 0, 10), repMin: num(i.repMin, "repetições mínimas", 0, 50),
         repMax: num(i.repMax, "repetições máximas", 0, 50), restSec: num(i.restSec, "descanso", 0, 600),
         ...(i.durationMin !== undefined ? { durationMin: num(i.durationMin, "duração", 1, 180) } : {}),
       };
@@ -93,7 +95,7 @@ export function parseBackup(raw: unknown): Backup {
     const startedAt = int(s.startedAt, "início da sessão", 1, 8.64e15);
     const sets = arr(s.sets, "séries da sessão", 500).map((x): LoggedSet => {
       if (!isObj(x)) return bad("Arquivo inválido: série.");
-      const exerciseId = str(x.exerciseId, "exercício da série", 1, 64);
+      const exerciseId = migrateId(str(x.exerciseId, "exercício da série", 1, 64));
       if (!known.has(exerciseId)) bad("Arquivo inválido: série de um exercício que não existe no backup.");
       return {
         exerciseId, setIndex: int(x.setIndex, "número da série", 0, 99),
@@ -120,7 +122,7 @@ export async function importBackup(db: TreinoDB, b: Backup): Promise<void> {
     await db.exercises.clear();
     await db.workouts.clear();
     await db.sessions.clear();
-    await db.exercises.bulkAdd([...seedExercises, ...b.exercises]);
+    await db.exercises.bulkAdd([...new Map([...seedExercises, ...b.exercises].map((e) => [e.id, e])).values()]);
     await db.workouts.bulkAdd(b.workouts);
     await db.sessions.bulkAdd(b.sessions);
   });

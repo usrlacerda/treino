@@ -2,6 +2,7 @@ import type { TreinoDB } from "./db";
 import { validateWorkout } from "./plan";
 import { MUSCLES } from "../lib/muscles";
 import { exercises as seedExercises } from "./seed";
+import { migrateId } from "./legacy";
 import type { Exercise, Muscle, PlanItem, Workout } from "./types";
 
 export const PLAN_KIND = "plano";
@@ -108,7 +109,8 @@ export async function buildPreview(db: TreinoDB, plan: PlanFile): Promise<Import
     return ex;
   };
 
-  const resolve = (it: FileItem): string | undefined => {
+  const resolve = (raw: FileItem): string | undefined => {
+    const it = raw.exerciseId ? { ...raw, exerciseId: migrateId(raw.exerciseId) } : raw;
     if (it.exerciseId && byId.has(it.exerciseId)) return it.exerciseId;
     const asFile: FileExercise | undefined = (it.exerciseId ? fileById.get(it.exerciseId) : undefined) ?? (it.exerciseName ? fileByName.get(norm(it.exerciseName)) : undefined);
     const nm = it.exerciseName ?? asFile?.name ?? it.exerciseId ?? "";
@@ -207,10 +209,10 @@ export function planTemplate() {
     workouts: [{
       name: "Treino D (exemplo)",
       items: [
-        { exerciseName: n("leg-press"), sets: 3, reps: "10-12", restSec: 90 },
-        { exerciseName: n("supino-inclinado-maq"), sets: 3, reps: "10-12", restSec: 75 },
+        { exerciseName: n("ds-1463"), sets: 3, reps: "10-12", restSec: 90 },
+        { exerciseName: n("ds-1299"), sets: 3, reps: "10-12", restSec: 75 },
         { exerciseName: "Remada curvada com barra", muscle: "costas", sets: 3, reps: "8-10", restSec: 75 },
-        { exerciseName: n("cardio"), durationMin: 15 },
+        { exerciseName: n("ds-3666"), durationMin: 15 },
       ],
     }],
   };
