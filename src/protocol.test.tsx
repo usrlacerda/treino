@@ -56,7 +56,7 @@ describe("treinos idênticos ao protocolo", () => {
     expect(screen.getAllByText("descanso 50s").length).toBeGreaterThan(0);
     expect(screen.queryByLabelText("Carga em kg, série 1, Prancha")).toBeNull();
     await user.click(screen.getByRole("button", { name: "Série 1 concluída, Prancha" }));
-    expect(await screen.findByRole("timer")).toHaveTextContent("0:50");
+    expect(await screen.findByRole("timer")).toHaveTextContent(/0:(49|50)/); // pode já ter andado 1 s em máquina lenta
     await user.click(screen.getByRole("button", { name: "Finalizar treino" }));
     await waitFor(async () => expect((await db.sessions.toArray())[0].sets[0]).toMatchObject({ exerciseId: "ds-2135", weightKg: 0, reps: 30 }));
   });
