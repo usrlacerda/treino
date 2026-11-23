@@ -345,3 +345,8 @@ button, input, select, textarea { font-family: inherit; }
 .addto-item { justify-content: flex-start; text-align: left; }
 .dialog.addto { align-items: stretch; max-width: 460px; }
 .dialog.addto h2, .dialog.addto p { margin: 0; }
+
+/* Tudo aparece junto: enquanto o passo a passo carrega, só o aviso fica visível (a imagem já baixa por trás). */
+.dialog.lightbox.loading > :not(.lb-wait) { visibility: hidden; height: 0; margin: 0; overflow: hidden; }
+.dialog.lightbox.loading { min-height: 96px; }
+.lb-wait { margin: 0; text-align: center; color: var(--muted, inherit); }

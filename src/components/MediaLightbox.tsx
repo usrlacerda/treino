@@ -11,11 +11,13 @@ export function MediaLightbox({ id, name, onClose, children }: { id: string; nam
     return () => window.removeEventListener("keydown", h);
   }, [onClose]);
   const [info, setInfo] = useState<Details>();
-  useEffect(() => { let on = true; void loadDetails(id).then((d) => { if (on) setInfo(d); }); return () => { on = false; }; }, [id]);
+  const [ready, setReady] = useState(false);
+  useEffect(() => { let on = true; setReady(false); void loadDetails(id).then((d) => { if (on) { setInfo(d); setReady(true); } }); return () => { on = false; }; }, [id]);
   const animated = hasAnim(id) && !prefersReducedMotion();
   return (
     <div className="overlay" onClick={onClose}>
-      <div className="dialog lightbox" role="dialog" aria-modal="true" aria-labelledby="lb-t" onClick={(e) => e.stopPropagation()}>
+      <div className={"dialog lightbox" + (ready ? "" : " loading")} role="dialog" aria-busy={!ready} aria-modal="true" aria-labelledby="lb-t" onClick={(e) => e.stopPropagation()}>
+        {!ready && <p className="lb-wait" role="status">Carregando…</p>}
         <h2 id="lb-t">{name}</h2>
         <div className="lightbox-img">
           <img src={animated ? animSrc(id) : mediaSrc(id)} alt={animated ? `${name}: demonstração do movimento` : name} />

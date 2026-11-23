@@ -81,3 +81,4 @@
 - Botão de atualizar do aviso: só o ícone (não estoura mais o aviso).
 - Biblioteca: tocar no exercício abre detalhes com "Adicionar a um treino" (escolhe treino existente ou cria treino novo já com o exercício; volta para Treinos com aviso).
 - App renomeado para "CG Fit" (título, manifest, cabeçalho, ajustes). Ícone: monograma "CG" branco sobre degradê roxo → magenta → laranja (icon.svg, PNGs 32/180/192/512 e maskable com margem de segurança).
+- Janela do exercício: imagem, texto e botões aparecem juntos (mostra "Carregando…" até o passo a passo chegar).
