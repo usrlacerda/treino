@@ -64,3 +64,5 @@
 - 2026-11-23: tela Treinos redesenhada (cartão do próximo treino destacado, prévia dos exercícios, botão play, editar só com ícone).
 - 2026-11-23: play removido; lápis de editar pequeno no canto do cartão.
 - 2026-11-23: miniaturas da Biblioteca e do Catálogo ampliam a demonstração em janela (MediaLightbox).
+- 2026-11-23: nomes do catálogo traduzidos para PT-BR (padrão de academia), ordenados A–Z, nome em inglês guardado para busca (tools/names-pt.json).
+- 2026-11-23: Biblioteca e Catálogo unificados (cards por grupo com figura, lista com filtro de equipamento, busca PT/EN); criar exercício removido; "Adicionar exercício" no editor de treino abre a Biblioteca.

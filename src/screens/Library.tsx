@@ -1,114 +1,132 @@
-import { BrandHeader } from "../components/Logo";
-import { Catalog } from "./Catalog";
+import { BrandBar, BrandHeader } from "../components/Logo";
+import { BodyFigure } from "../components/BodyFigure";
 import { Icon } from "../components/Icon";
+import { MediaLightbox } from "../components/MediaLightbox";
 import { useEffect, useMemo, useState } from "react";
 import type { TreinoDB } from "../db/db";
-import { addExercise, deleteExercise } from "../db/plan";
-import type { Exercise, Muscle } from "../db/types";
-import { mediaFrames, mediaSrc } from "../lib/media";
-import { MediaLightbox } from "../components/MediaLightbox";
-import { MUSCLE_LABEL, MUSCLES } from "../lib/muscles";
+import type { Exercise } from "../db/types";
+import { loadCatalog, norm, type CatalogItem } from "../lib/catalog";
+import { EQUIP_FILTERS, GROUPS, buildItems, featuredFor, type EquipKey, type GroupId, type LibItem } from "../lib/library";
+import { hasAnim, mediaSrc } from "../lib/media";
 
-const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLocaleLowerCase("pt-BR");
+const PAGE = 30;
+interface Props {
+  db: TreinoDB;
+  /** Modo de escolha (ao montar um treino): mostra "Adicionar" em cada exercício. */
+  onPick?: (ex: Exercise) => void;
+  onClose?: () => void;
+  /** ids de exercícios que já estão no treino (não aparecem para escolher). */
+  hide?: Set<string>;
+}
 
-export function Library({ db }: { db: TreinoDB }) {
-  const [list, setList] = useState<Exercise[]>([]);
+/** Biblioteca única: todos os exercícios (catálogo de ~1.300 + próprios), organizados por grupo muscular. Dados: hasaneyldrm/exercises-dataset; mídia © Gym visual. */
+export function Library({ db, onPick, onClose, hide }: Props) {
+  const [catalog, setCatalog] = useState<CatalogItem[]>();
+  const [saved, setSaved] = useState<Exercise[]>([]);
+  const [failed, setFailed] = useState(false);
   const [q, setQ] = useState("");
-  const [muscle, setMuscle] = useState<Muscle | "">("");
-  const [adding, setAdding] = useState(false);
-  const [browsing, setBrowsing] = useState(false);
-  const [error, setError] = useState<string>();
-  const [toDelete, setToDelete] = useState<Exercise>();
+  const [group, setGroup] = useState<GroupId>();
+  const [equip, setEquip] = useState<EquipKey | "">("");
+  const [limit, setLimit] = useState(PAGE);
   const [zoom, setZoom] = useState<{ id: string; name: string }>();
-  const [form, setForm] = useState({ name: "", muscle: "" as Muscle | "", equipment: "", cue: "" });
 
-  const reload = () => db.exercises.toArray().then((e) => setList(e.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"))));
-  useEffect(() => { void reload(); }, [db]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    let alive = true;
+    loadCatalog().then((c) => alive && setCatalog(c)).catch(() => alive && setFailed(true));
+    void db.exercises.toArray().then((e) => alive && setSaved(e));
+    return () => { alive = false; };
+  }, [db]);
 
-  const shown = useMemo(
-    () => list.filter((e) => (!muscle || e.muscle === muscle) && (!q.trim() || norm(e.name).includes(norm(q.trim())))),
-    [list, q, muscle],
-  );
+  const all = useMemo(() => (catalog || failed ? buildItems(catalog, saved) : []), [catalog, saved, failed]);
+  const items = useMemo(() => (hide ? all.filter((i) => !hide.has(i.id)) : all), [all, hide]);
+  const loading = !catalog && !failed;
+  const searching = q.trim() !== "";
 
-  async function save(e: React.FormEvent) {
-    e.preventDefault();
-    try {
-      if (!form.muscle) throw new Error("Escolha o grupo muscular.");
-      await addExercise(db, { ...form, muscle: form.muscle });
-      setForm({ name: "", muscle: "", equipment: "", cue: "" });
-      setAdding(false); setError(undefined);
-      await reload();
-    } catch (err) { setError((err as Error).message); }
-  }
-  async function confirmDelete() {
-    if (!toDelete) return;
-    try { await deleteExercise(db, toDelete.id); setError(undefined); await reload(); }
-    catch (err) { setError((err as Error).message); }
-    setToDelete(undefined);
-  }
+  const inGroup = useMemo(() => (group ? items.filter((i) => i.group === group) : items), [items, group]);
+  const shown = useMemo(() => {
+    const t = norm(q.trim());
+    return inGroup.filter((i) => (!equip || i.equip === equip) && (!t || norm(i.name).includes(t) || (i.en && norm(i.en).includes(t)) || norm(i.equipLabel).includes(t)));
+  }, [inGroup, q, equip]);
+  const equipCounts = useMemo(() => {
+    const m = new Map<EquipKey, number>();
+    for (const i of inGroup) m.set(i.equip, (m.get(i.equip) ?? 0) + 1);
+    return m;
+  }, [inGroup]);
 
-  if (browsing) return <Catalog db={db} onClose={() => { setBrowsing(false); void reload(); }} />;
+  const current = GROUPS.find((g) => g.id === group);
+  const listMode = !!group || searching;
+  const goBack = () => { if (group) { setGroup(undefined); setEquip(""); setLimit(PAGE); } else onClose?.(); };
+  const title = current?.label ?? (onPick ? "Escolher exercício" : "Biblioteca");
+
   return (
     <main className="app">
-      <BrandHeader title="Biblioteca" />
+      {group || onPick
+        ? (<>
+            <BrandBar compact />
+            <header className="bar">
+              <button className="btn text back" onClick={goBack}><Icon name="back" />{group ? "Voltar" : "Cancelar"}</button>
+              <h1>{title}</h1>
+            </header>
+          </>)
+        : <BrandHeader title="Biblioteca" />}
       <label className="field">Buscar exercício
-        <input type="search" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input type="search" value={q} onChange={(e) => { setQ(e.target.value); setLimit(PAGE); }} />
       </label>
-      <div className="chips" role="group" aria-label="Filtrar por grupo muscular">
-        <button className="chip" aria-pressed={muscle === ""} onClick={() => setMuscle("")}>{muscle === "" && <Icon name="check" size={18} />}Todos</button>
-        {MUSCLES.map((m) => (
-          <button key={m} className="chip" aria-pressed={muscle === m} onClick={() => setMuscle(muscle === m ? "" : m)}>{muscle === m && <Icon name="check" size={18} />}{MUSCLE_LABEL[m]}</button>
-        ))}
-      </div>
-      {error && <p className="error block" role="alert">{error}</p>}
-      {!adding && <button className="btn wide" onClick={() => setAdding(true)}><Icon name="add" size={20} />Novo exercício</button>}
-      {!adding && <button className="btn ghost wide" onClick={() => setBrowsing(true)}><Icon name="download" size={20} />Explorar catálogo (1.324)</button>}
-      {adding && (
-        <form className="exercise" onSubmit={save} aria-label="Novo exercício">
-          <h2>Novo exercício</h2>
-          <label className="field">Nome<input value={form.name} maxLength={60} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
-          <label className="field">Grupo muscular
-            <select value={form.muscle} onChange={(e) => setForm({ ...form, muscle: e.target.value as Muscle })}>
-              <option value="">Escolha…</option>
-              {MUSCLES.map((m) => <option key={m} value={m}>{MUSCLE_LABEL[m]}</option>)}
-            </select>
-          </label>
-          <label className="field">Equipamento (opcional)<input value={form.equipment} maxLength={40} onChange={(e) => setForm({ ...form, equipment: e.target.value })} /></label>
-          <label className="field">Dica de execução (opcional)<input value={form.cue} maxLength={200} onChange={(e) => setForm({ ...form, cue: e.target.value })} /></label>
-          <div className="row-actions">
-            <button type="submit" className="btn"><Icon name="save" size={20} />Salvar exercício</button>
-            <button type="button" className="btn ghost" onClick={() => { setAdding(false); setError(undefined); }}>Cancelar</button>
-          </div>
-        </form>
+      {failed && !catalog && <p className="error block" role="alert">Não conseguimos carregar todos os exercícios. Conecte-se à internet para ver a biblioteca completa.</p>}
+      {loading && <p className="muted" role="status">Carregando exercícios…</p>}
+
+      {!loading && !listMode && (
+        <ul className="group-list">
+          {GROUPS.map((g) => {
+            const n = items.filter((i) => i.group === g.id).length;
+            const ex = featuredFor(g, items);
+            return (
+              <li key={g.id}>
+                <button className="group-card" onClick={() => { setGroup(g.id); setLimit(PAGE); }}>
+                  <BodyFigure group={g.id} view={g.view} />
+                  <span className="group-main">
+                    <span className="group-head"><span className="group-name">{g.label}</span><Icon name="back" size={20} /></span>
+                    <span className="muted">{n.toLocaleString("pt-BR")} {n === 1 ? "exercício" : "exercícios"}</span>
+                    {ex.length > 0 && <span className="group-ex" aria-hidden="true">{ex.map((e) => <span key={e.id}>{e.name}</span>)}</span>}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       )}
-      <p className="muted" aria-live="polite">{shown.length === 1 ? "1 exercício" : `${shown.length} exercícios`}</p>
-      {shown.length === 0 && <p className="muted empty-inline">Nenhum exercício encontrado. Mude a busca, limpe o filtro ou crie um novo.</p>}
-      <ul className="lib-list">
-        {shown.map((e) => {
-          const own = /^(custom|ds)-/.test(e.id);
-          return (
-            <li key={e.id} className="lib-item">
-              {mediaFrames(e.id) ? <button className="thumb" aria-label={`Ampliar demonstração de ${e.name}`} onClick={() => setZoom({ id: e.id, name: e.name })}><img src={mediaSrc(e.id, 0)} alt="" width="56" height="56" loading="lazy" /></button> : <span className="lib-ph" aria-hidden="true" />}
-              <div className="lib-text">
-                <strong>{e.name}</strong>
-                <span className="muted">{MUSCLE_LABEL[e.muscle]} · {e.equipment}{own && <span className="badge inline">{e.id.startsWith("ds-") ? "Catálogo" : "Próprio"}</span>}</span>
-              </div>
-              {own && <button className="btn text danger small" aria-label={`Apagar ${e.name}`} onClick={() => setToDelete(e)}><Icon name="delete" size={18} />Apagar</button>}
-            </li>
-          );
-        })}
-      </ul>
+
+      {!loading && listMode && (
+        <>
+          <div className="chips" role="group" aria-label="Filtrar por equipamento">
+            <button className="chip" aria-pressed={equip === ""} onClick={() => { setEquip(""); setLimit(PAGE); }}>{equip === "" && <Icon name="check" size={18} />}Todos</button>
+            {EQUIP_FILTERS.filter((f) => equipCounts.has(f.key)).map((f) => (
+              <button key={f.key} className="chip" aria-pressed={equip === f.key} onClick={() => { setEquip(equip === f.key ? "" : f.key); setLimit(PAGE); }}>
+                {equip === f.key && <Icon name="check" size={18} />}{f.label}
+              </button>
+            ))}
+          </div>
+          <p className="muted" aria-live="polite">{shown.length === 1 ? "1 exercício" : `${shown.length.toLocaleString("pt-BR")} exercícios`}</p>
+          {shown.length === 0 && <p className="muted empty-inline">Nenhum exercício encontrado. Mude a busca ou o filtro de equipamento.</p>}
+          <ul className="lib-list">
+            {shown.slice(0, limit).map((i) => (
+              <li key={i.id} className="lib-item">
+                {hasAnim(i.id)
+                  ? <button className="thumb" aria-label={`Ampliar demonstração de ${i.name}`} onClick={() => setZoom({ id: i.id, name: i.name })}><img src={mediaSrc(i.id, 0)} alt="" width="56" height="56" loading="lazy" /></button>
+                  : <span className="lib-ph" aria-hidden="true" />}
+                <div className="lib-text">
+                  <strong>{i.name}</strong>
+                  <span className="muted">{i.equipLabel}{i.target ? ` · ${i.target}` : ""}{i.custom && <span className="badge inline">Próprio</span>}</span>
+                </div>
+                {onPick && <button className="btn tonal small" aria-label={`Adicionar ${i.name}`} onClick={() => onPick(i.ex)}><Icon name="add" size={18} />Adicionar</button>}
+              </li>
+            ))}
+          </ul>
+          {shown.length > limit && <button className="btn ghost wide" onClick={() => setLimit((n) => n + PAGE)}>Mostrar mais ({(shown.length - limit).toLocaleString("pt-BR")})</button>}
+        </>
+      )}
       {zoom && <MediaLightbox id={zoom.id} name={zoom.name} onClose={() => setZoom(undefined)} />}
-      {toDelete && (
-        <div className="overlay">
-          <div className="dialog" role="alertdialog" aria-modal="true" aria-labelledby="apg-t">
-            <h2 id="apg-t">Apagar “{toDelete.name}”?</h2>
-            <p className="muted">Ele sai da Biblioteca. Não dá para desfazer.</p>
-            <button className="btn danger" onClick={() => void confirmDelete()}><Icon name="delete" size={20} />Apagar exercício</button>
-            <button className="btn ghost" autoFocus onClick={() => setToDelete(undefined)}>Cancelar</button>
-          </div>
-        </div>
-      )}
+      <p className="muted credits">Dados: hasaneyldrm/exercises-dataset. Imagens © <a href="https://gymvisual.com/" target="_blank" rel="noreferrer nofollow">Gym visual</a> (abre em nova aba).</p>
     </main>
   );
 }

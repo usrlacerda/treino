@@ -1,8 +1,8 @@
 import type { Exercise, Muscle } from "../db/types";
 
 /** Item do catálogo: [id, nome (inglês), grupo, equipamento (inglês), alvo (inglês)]. Dados: hasaneyldrm/exercises-dataset; mídia © Gym visual. */
-export type CatalogRow = [string, string, Muscle, string, string];
-export interface CatalogItem { id: string; name: string; muscle: Muscle; equipment: string; target: string }
+export type CatalogRow = [string, string, Muscle, string, string, string?];
+export interface CatalogItem { id: string; name: string; muscle: Muscle; equipment: string; target: string; en?: string }
 
 export const EQUIPMENT_PT: Record<string, string> = {
   "body weight": "Peso do corpo", dumbbell: "Halteres", cable: "Polia", barbell: "Barra", "leverage machine": "Máquina",
@@ -21,7 +21,7 @@ export const TARGET_PT: Record<string, string> = {
 export const equipmentPt = (e: string) => EQUIPMENT_PT[e] ?? e;
 export const targetPt = (t: string) => TARGET_PT[t] ?? t;
 
-export const toItem = (r: CatalogRow): CatalogItem => ({ id: r[0], name: r[1], muscle: r[2], equipment: r[3], target: r[4] });
+export const toItem = (r: CatalogRow): CatalogItem => ({ id: r[0], name: r[1], muscle: r[2], equipment: r[3], target: r[4], en: r[5] });
 /** Remove acentos e caixa para a busca. */
 export const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 

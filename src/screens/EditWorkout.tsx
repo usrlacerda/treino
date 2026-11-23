@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { saveWorkout } from "../db/plan";
 import type { Exercise, Workout } from "../db/types";
+import { Library } from "./Library";
+import { dsIdOfSaved } from "../lib/library";
+import { catalogExerciseId } from "../lib/catalog";
 
 interface Row { exerciseId: string; sets: string; repMin: string; repMax: string; restSec: string; durationMin?: string }
 interface Props { db: TreinoDB; workoutId: string; onClose: (saved?: string) => void }
@@ -15,7 +18,7 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
   const [name, setName] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
   const [lib, setLib] = useState<Exercise[]>([]);
-  const [pick, setPick] = useState("");
+  const [picking, setPicking] = useState(false);
   const [error, setError] = useState<string>();
 
   useEffect(() => {
@@ -30,17 +33,20 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
   if (!base) return <main className="app"><p className="muted">Carregando…</p></main>;
 
   const byId = Object.fromEntries(lib.map((e) => [e.id, e]));
-  const available = lib.filter((e) => !rows.some((r) => r.exerciseId === e.id));
   const patch = (i: number, p: Partial<Row>) => { setRows((rs) => rs.map((r, n) => (n === i ? { ...r, ...p } : r))); setError(undefined); };
   const move = (i: number, d: -1 | 1) => setRows((rs) => { const n = [...rs]; [n[i], n[i + d]] = [n[i + d], n[i]]; return n; });
   const remove = (i: number) => setRows((rs) => rs.filter((_, n) => n !== i));
-  const add = () => {
-    const ex = byId[pick]; if (!ex) return;
+  const add = async (ex: Exercise) => {
+    if (!byId[ex.id]) { await db.exercises.put(ex); setLib((l) => [...l, ex].sort((a, b) => a.name.localeCompare(b.name, "pt-BR"))); }
     setRows((rs) => [...rs, ex.muscle === "cardio"
       ? { exerciseId: ex.id, sets: "1", repMin: "0", repMax: "0", restSec: "0", durationMin: "15" }
       : { exerciseId: ex.id, sets: "3", repMin: "8", repMax: "12", restSec: "60" }]);
-    setPick("");
+    setPicking(false); setError(undefined);
   };
+  /** Já no treino: esconde o mesmo exercício na escolha, mesmo que venha do protocolo inicial. */
+  const inWorkout = new Set(rows.flatMap((r) => { const d = dsIdOfSaved(r.exerciseId); return d ? [r.exerciseId, catalogExerciseId(d)] : [r.exerciseId]; }));
+
+  if (picking) return <Library db={db} hide={inWorkout} onPick={(ex) => void add(ex)} onClose={() => setPicking(false)} />;
 
   async function save() {
     const w: Workout = {
@@ -83,15 +89,7 @@ export function EditWorkout({ db, workoutId, onClose }: Props) {
           </section>
         );
       })}
-      <div className="exercise">
-        <label className="field">Adicionar exercício
-          <select value={pick} onChange={(e) => setPick(e.target.value)}>
-            <option value="">Escolha um exercício…</option>
-            {available.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
-          </select>
-        </label>
-        <button className="btn tonal" disabled={!pick} onClick={add}><Icon name="add" size={20} />Adicionar ao treino</button>
-      </div>
+      <button className="btn tonal wide" onClick={() => setPicking(true)}><Icon name="add" size={20} />Adicionar exercício</button>
       {error && <p className="error block" role="alert">{error}</p>}
       <button className="primary" onClick={() => void save()}><Icon name="save" />Salvar alterações</button>
     </main>
