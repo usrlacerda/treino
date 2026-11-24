@@ -3,7 +3,6 @@ import { Icon } from "../components/Icon";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TreinoDB } from "../db/db";
 import { discardSession, listFinishedSessions } from "../db/repo";
-import { Measures } from "../components/Measures";
 import { sessionText, shareText } from "../lib/share";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import type { Exercise, Session } from "../db/types";
@@ -85,7 +84,6 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
         <p className="muted">Conclua um treino para ver seu progresso aqui.</p>
         {onGoTreinos && <button className="btn" onClick={onGoTreinos}><Icon name="play" size={20} />Ir para Treinos</button>}
       </section>
-      <Measures db={db} />
       {extras}
     </main>
   );
@@ -122,7 +120,6 @@ export function History({ db, onGoTreinos }: { db: TreinoDB; onGoTreinos?: () =>
           <button className="btn icon danger" aria-label={`Excluir treino ${names[s.workoutId] ?? s.workoutId} de ${formatDateFull(s.startedAt)}`} title="Excluir treino" onClick={() => setAsking(s)}><Icon name="delete" /></button>
         </div>
       ))}
-      <Measures db={db} />
       {extras}
     </main>
   );

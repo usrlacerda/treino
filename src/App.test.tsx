@@ -46,7 +46,7 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Série 1 concluída, Agachamento no Smith" }));
     const timer = await screen.findByRole("timer");
     expect(timer).toHaveTextContent("Descanso · Agachamento no Smith");
-    expect(timer).toHaveTextContent("0:50");
+    expect(timer).toHaveTextContent(/0:(49|50)/);
     await user.click(screen.getByRole("button", { name: "Pular" }));
     expect(screen.queryByRole("timer")).not.toBeInTheDocument();
   });

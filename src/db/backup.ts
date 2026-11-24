@@ -3,7 +3,7 @@ import { exercises as seedExercises } from "./seed";
 import { migrateId } from "./legacy";
 import { validateWorkout } from "./plan";
 import { MUSCLES } from "../lib/muscles";
-import type { Exercise, LoggedSet, Measure, Session, Workout } from "./types";
+import type { Exercise, LoggedSet, Session, Workout } from "./types";
 
 export const BACKUP_APP = "treino";
 export const BACKUP_SCHEMA = 1;
@@ -16,13 +16,12 @@ export interface Backup {
   exercises: Exercise[]; // só os exercícios próprios
   workouts: Workout[];
   sessions: Session[];
-  measures?: Measure[];
 }
 
 /** Os exercícios do protocolo inicial já vêm com o app, então não entram no arquivo. */
 export async function exportData(db: TreinoDB): Promise<Backup> {
-  const [ex, workouts, sessions, measures] = await Promise.all([db.exercises.toArray(), db.workouts.orderBy("order").toArray(), db.sessions.toArray(), db.measures.toArray()]);
-  return { app: BACKUP_APP, schema: BACKUP_SCHEMA, exportedAt: new Date().toISOString(), exercises: ex.filter((e) => /^(custom|ds)-/.test(e.id) && !seedExercises.some((s) => s.id === e.id)), workouts, sessions, measures };
+  const [ex, workouts, sessions] = await Promise.all([db.exercises.toArray(), db.workouts.orderBy("order").toArray(), db.sessions.toArray()]);
+  return { app: BACKUP_APP, schema: BACKUP_SCHEMA, exportedAt: new Date().toISOString(), exercises: ex.filter((e) => /^(custom|ds)-/.test(e.id) && !seedExercises.some((s) => s.id === e.id)), workouts, sessions };
 }
 
 class BackupError extends Error {}
@@ -106,13 +105,8 @@ export function parseBackup(raw: unknown): Backup {
     return { id, workoutId, startedAt, ...(s.finishedAt !== undefined ? { finishedAt: int(s.finishedAt, "fim da sessão", 1, 8.64e15) } : {}), ...(s.note !== undefined ? { note: str(s.note, "anotação", 0, 500) } : {}), sets };
   });
 
-  const measures = (raw.measures === undefined ? [] : arr(raw.measures, "lista de medidas", 5000)).map((m): Measure => {
-    if (!isObj(m)) return bad("Arquivo inválido: medida.");
-    const opt = (k: string, max: number) => (m[k] !== undefined ? { [k]: num(m[k], `medida (${k})`, 0, max) } : {});
-    return { date: int(m.date, "data da medida", 1, 8.64e15), ...opt("weightKg", 500), ...opt("waistCm", 300), ...opt("chestCm", 300), ...opt("armCm", 200), ...opt("thighCm", 200) };
-  });
 
-  return { app: BACKUP_APP, schema: BACKUP_SCHEMA, exportedAt, exercises, workouts, sessions, measures };
+  return { app: BACKUP_APP, schema: BACKUP_SCHEMA, exportedAt, exercises, workouts, sessions };
 }
 
 export function parseBackupText(text: string): Backup {
@@ -125,15 +119,13 @@ export const isBackupError = (e: unknown): e is Error => e instanceof BackupErro
 
 /** Substitui tudo de uma vez: se algo falhar, nada muda. */
 export async function importBackup(db: TreinoDB, b: Backup): Promise<void> {
-  await db.transaction("rw", db.exercises, db.workouts, db.sessions, db.measures, async () => {
+  await db.transaction("rw", db.exercises, db.workouts, db.sessions, async () => {
     await db.exercises.clear();
     await db.workouts.clear();
     await db.sessions.clear();
-    await db.measures.clear();
     await db.exercises.bulkAdd([...new Map([...seedExercises, ...b.exercises].map((e) => [e.id, e])).values()]);
     await db.workouts.bulkAdd(b.workouts);
     await db.sessions.bulkAdd(b.sessions);
-    await db.measures.bulkAdd(b.measures ?? []);
   });
 }
 

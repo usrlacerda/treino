@@ -1,5 +1,5 @@
 import Dexie, { type Table } from "dexie";
-import type { Exercise, Measure, Session, Workout } from "./types";
+import type { Exercise, Session, Workout } from "./types";
 import { exercises, workouts } from "./seed";
 import { LEGACY_IDS, migrateSession, migrateWorkout } from "./legacy";
 
@@ -7,7 +7,6 @@ export class TreinoDB extends Dexie {
   exercises!: Table<Exercise, string>;
   workouts!: Table<Workout, string>;
   sessions!: Table<Session, number>;
-  measures!: Table<Measure, number>;
 
   constructor(name = "treino") {
     super(name);
@@ -40,12 +39,19 @@ export class TreinoDB extends Dexie {
       workouts: "id, order",
       sessions: "++id, workoutId, startedAt",
     }).upgrade((tx) => tx.table("exercises").bulkPut(exercises));
-    // v5: medidas corporais.
+    // v5: tabela de medidas corporais (recurso removido depois).
     this.version(5).stores({
       exercises: "id, muscle",
       workouts: "id, order",
       sessions: "++id, workoutId, startedAt",
       measures: "++id, date",
+    });
+    // v6: remove a tabela de medidas corporais.
+    this.version(6).stores({
+      exercises: "id, muscle",
+      workouts: "id, order",
+      sessions: "++id, workoutId, startedAt",
+      measures: null,
     });
   }
 }

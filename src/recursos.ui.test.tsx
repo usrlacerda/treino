@@ -70,7 +70,7 @@ describe("treino ativo: recursos", () => {
   });
 });
 
-describe("histórico: compartilhar, anotação e medidas", () => {
+describe("histórico: compartilhar", () => {
   it("compartilhar copia o resumo quando o aparelho não tem compartilhamento", async () => {
     const db = await withHistory();
     const user = userEvent.setup();
@@ -83,22 +83,6 @@ describe("histórico: compartilhar, anotação e medidas", () => {
     expect(writeText.mock.calls[0][0]).toContain("Treino A");
   });
 
-  it("registra medidas, mostra a diferença e exclui com confirmação", async () => {
-    const db = await withHistory();
-    const user = userEvent.setup();
-    render(<History db={db} />);
-    const sec = (await screen.findAllByRole("region", { name: "Medidas corporais" }))[0];
-    await user.click(within(sec).getByRole("button", { name: "Registrar medidas" }));
-    await user.click(within(sec).getByRole("button", { name: "Salvar medidas" }));
-    expect(await within(sec).findByRole("alert")).toHaveTextContent("Preencha pelo menos um campo");
-    await user.type(within(sec).getByLabelText("Peso (kg)"), "80,5");
-    await user.click(within(sec).getByRole("button", { name: "Salvar medidas" }));
-    expect(await within(sec).findByText(/Peso 80,5 kg/)).toBeInTheDocument();
-    expect(await db.measures.count()).toBe(1);
-    await user.click(within(sec).getByRole("button", { name: /^Excluir medidas de/ }));
-    await user.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Excluir medidas" }));
-    await waitFor(async () => expect(await db.measures.count()).toBe(0));
-  });
 });
 
 describe("meta da semana e backup", () => {
@@ -114,14 +98,12 @@ describe("meta da semana e backup", () => {
     expect(screen.getByText(/meta batida/)).toBeInTheDocument();
   });
 
-  it("backup leva medidas e anotações junto", async () => {
+  it("backup leva as anotações dos treinos junto", async () => {
     const db = await withHistory();
     await db.sessions.toCollection().modify({ note: "boa" });
-    await db.measures.add({ date: 1700000000000, weightKg: 80, waistCm: 90 });
     const b = parseBackup(JSON.parse(JSON.stringify(await exportData(db))));
     const other = fresh(); await seedIfEmpty(other);
     await importBackup(other, b);
     expect((await other.sessions.toArray())[0].note).toBe("boa");
-    expect(await other.measures.toArray()).toEqual([expect.objectContaining({ weightKg: 80, waistCm: 90 })]);
   });
 });
